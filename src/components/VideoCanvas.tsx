@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import VideoControls from './VideoControls';
+
 interface VideoCanvasProps {
   src: string;
   className?: string;
@@ -7,6 +8,7 @@ interface VideoCanvasProps {
   nextVideoSrc?: string;
   thirdVideoSrc?: string;
 }
+
 const VideoCanvas: React.FC<VideoCanvasProps> = ({
   src,
   className = '',
@@ -20,11 +22,13 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   const [isPlaying, setIsPlaying] = useState(autoPlay);
   const [currentSrc, setCurrentSrc] = useState(src);
   const [isSecondVideo, setIsSecondVideo] = useState(false);
+
   useEffect(() => {
     if (videoRef.current && autoPlay) {
       videoRef.current.play();
     }
   }, [autoPlay]);
+
   useEffect(() => {
     const handleEnded = () => {
       if (!isSecondVideo && nextVideoSrc) {
@@ -50,6 +54,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
       }
     };
   }, [nextVideoSrc, thirdVideoSrc, isSecondVideo]);
+
   const handlePlayPause = () => {
     if (videoRef.current) {
       if (isPlaying) {
@@ -60,6 +65,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
       setIsPlaying(!isPlaying);
     }
   };
+
   const handleFullscreen = () => {
     if (videoRef.current) {
       if (!document.fullscreenElement) {
@@ -69,22 +75,32 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
       }
     }
   };
-  return <div className={`relative w-full max-w-3xl mx-auto ${className}`}>
-      <div className="relative w-full" style={{
-      aspectRatio: '16/9'
-    }}>
-        {/* Main video */}
-        <video ref={videoRef} src={currentSrc} onClick={handlePlayPause} autoPlay={autoPlay} preload="auto" className="absolute inset-0 w-full h-full object-contain py-[14px] px-[29px]" />
+
+  return (
+    <div className={`relative w-full max-w-6xl mx-auto ${className}`}>
+      <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
+        <video 
+          ref={videoRef} 
+          src={currentSrc} 
+          onClick={handlePlayPause} 
+          autoPlay={autoPlay} 
+          preload="auto" 
+          className="absolute inset-0 w-full h-full object-contain" 
+        />
         
-        {/* Preload next videos */}
         {nextVideoSrc && <video ref={nextVideoRef} src={nextVideoSrc} className="hidden" preload="auto" />}
         {thirdVideoSrc && <video ref={thirdVideoRef} src={thirdVideoSrc} className="hidden" preload="auto" />}
         
-        {/* Frame overlay */}
-        <img src="/lovable-uploads/7eb4c391-0a60-485b-8489-d1e842d5e45a.png" alt="Video frame" className="absolute inset-0 w-full h-full pointer-events-none z-10" />
+        <img 
+          src="/lovable-uploads/7eb4c391-0a60-485b-8489-d1e842d5e45a.png" 
+          alt="Video frame" 
+          className="absolute inset-0 w-full h-full pointer-events-none z-10" 
+        />
         
         <VideoControls isPlaying={isPlaying} onPlayPause={handlePlayPause} onFullscreen={handleFullscreen} />
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default VideoCanvas;
