@@ -27,13 +27,15 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   const [isSecondVideo, setIsSecondVideo] = useState(false);
   const [showDayImage, setShowDayImage] = useState(false);
   const dayAssets = getCurrentDayAssets();
+  const [currentDay] = useState(new Date().getDay() === 4 ? 'thursday' : '');
 
-  // Preload audio
+  // Force audio loading on component mount
   useEffect(() => {
     if (audioRef.current) {
+      audioRef.current.src = dayAssets.sound;
       audioRef.current.load();
     }
-  }, []);
+  }, [dayAssets.sound]);
 
   useEffect(() => {
     if (videoRef.current && autoPlay) {
@@ -46,17 +48,16 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
       if (!isSecondVideo && nextVideoSrc) {
         setShowDayImage(true);
         
-        // Play the audio synchronously with the image display
+        // Play audio immediately when showing the day image
         if (audioRef.current) {
           try {
-            // Explicitly set the source again to ensure it's loaded
-            const dayAssets = getCurrentDayAssets();
-            audioRef.current.src = dayAssets.sound;
-            audioRef.current.load();
-            audioRef.current.volume = 1.0; // Ensure volume is at maximum
             console.log("Attempting to play audio:", dayAssets.sound);
+            audioRef.current.currentTime = 0;
+            audioRef.current.volume = 1.0;
             
+            // Create separate promise for audio playback
             const playPromise = audioRef.current.play();
+            
             if (playPromise !== undefined) {
               playPromise.catch(error => {
                 console.error("Audio playback error:", error);
@@ -93,7 +94,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
         video.removeEventListener('ended', handleEnded);
       }
     };
-  }, [nextVideoSrc, thirdVideoSrc, isSecondVideo]);
+  }, [nextVideoSrc, thirdVideoSrc, isSecondVideo, dayAssets.sound]);
 
   const handlePlayPause = () => {
     if (videoRef.current) {
@@ -141,7 +142,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
           </div>
         )}
         
-        {/* Audio element with controls for testing purposes */}
+        {/* Audio element for day-specific sound */}
         <audio 
           ref={audioRef} 
           src={dayAssets.sound}
