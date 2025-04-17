@@ -25,9 +25,8 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   const [isPlaying, setIsPlaying] = useState(autoPlay);
   const [currentSrc, setCurrentSrc] = useState(src);
   const [isSecondVideo, setIsSecondVideo] = useState(false);
-  const [showDayImage, setShowDayImage] = useState(false);
+  const [showOverlay, setShowOverlay] = useState(false);
   const dayAssets = getCurrentDayAssets();
-  const [currentDay] = useState(new Date().getDay() === 4 ? 'thursday' : '');
 
   // Force audio loading on component mount
   useEffect(() => {
@@ -46,32 +45,24 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   useEffect(() => {
     const handleEnded = async () => {
       if (!isSecondVideo && nextVideoSrc) {
-        setShowDayImage(true);
+        setShowOverlay(true);
         
-        // Play audio immediately when showing the day image
+        // Play audio immediately when showing the overlay
         if (audioRef.current) {
           try {
             console.log("Attempting to play audio:", dayAssets.sound);
             audioRef.current.currentTime = 0;
             audioRef.current.volume = 1.0;
-            
-            // Create separate promise for audio playback
-            const playPromise = audioRef.current.play();
-            
-            if (playPromise !== undefined) {
-              playPromise.catch(error => {
-                console.error("Audio playback error:", error);
-              });
-            }
+            await audioRef.current.play();
           } catch (error) {
-            console.error("Audio setup error:", error);
+            console.error("Audio playback error:", error);
           }
         }
         
         // Wait for 4 seconds before continuing to next video
         await new Promise(resolve => setTimeout(resolve, 4000));
         
-        setShowDayImage(false);
+        setShowOverlay(false);
         setCurrentSrc(nextVideoSrc);
         setIsSecondVideo(true);
         if (videoRef.current) {
@@ -132,17 +123,16 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
         {nextVideoSrc && <video ref={nextVideoRef} src={nextVideoSrc} className="hidden" preload="auto" />}
         {thirdVideoSrc && <video ref={thirdVideoRef} src={thirdVideoSrc} className="hidden" preload="auto" />}
         
-        {showDayImage && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black">
+        {showOverlay && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
             <img 
-              src={dayAssets.image} 
-              alt="Day specific" 
+              src="/lovable-uploads/e1cd4230-56a7-4eb7-aacc-ce7f48d1b06c.png" 
+              alt="Today is Thursday" 
               className="max-w-full max-h-full object-contain animate-fade-in" 
             />
           </div>
         )}
         
-        {/* Audio element for day-specific sound */}
         <audio 
           ref={audioRef} 
           src={dayAssets.sound}
