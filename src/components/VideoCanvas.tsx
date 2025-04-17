@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useEffect } from 'react';
 import VideoControls from './VideoControls';
 
@@ -86,7 +85,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
           onClick={handlePlayPause} 
           autoPlay={autoPlay} 
           preload="auto" 
-          className="absolute inset-0 w-full h-full object-contain z-0" 
+          className="absolute inset-0 w-full h-full object-contain" 
         />
         
         {nextVideoSrc && <video ref={nextVideoRef} src={nextVideoSrc} className="hidden" preload="auto" />}
@@ -95,7 +94,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
         <img 
           src="/lovable-uploads/7eb4c391-0a60-485b-8489-d1e842d5e45a.png" 
           alt="Video frame" 
-          className="absolute inset-0 w-[101%] h-[101%] -top-[0.5%] -left-[0.5%] pointer-events-none z-10" 
+          className="absolute inset-0 w-full h-full pointer-events-none z-10" 
         />
         
         <VideoControls isPlaying={isPlaying} onPlayPause={handlePlayPause} onFullscreen={handleFullscreen} />
