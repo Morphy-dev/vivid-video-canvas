@@ -1,3 +1,4 @@
+
 import React, { useRef, useState, useEffect } from 'react';
 import VideoControls from './VideoControls';
 import { getCurrentDayAssets } from '../utils/dayAssets';
@@ -26,7 +27,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(autoPlay);
   const [currentSrc, setCurrentSrc] = useState(src);
-  const [isSecondVideo, setIsSecondVideo] = useState(false);
+  const [currentVideoIndex, setCurrentVideoIndex] = useState(1); // Track which video is playing (1-4)
   const [showOverlay, setShowOverlay] = useState(false);
   const dayAssets = getCurrentDayAssets();
 
@@ -45,7 +46,8 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
 
   useEffect(() => {
     const handleEnded = async () => {
-      if (!isSecondVideo && nextVideoSrc) {
+      // First video ended
+      if (currentVideoIndex === 1 && nextVideoSrc) {
         setShowOverlay(true);
         
         if (audioRef.current) {
@@ -63,17 +65,23 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
         
         setShowOverlay(false);
         setCurrentSrc(nextVideoSrc);
-        setIsSecondVideo(true);
+        setCurrentVideoIndex(2);
         if (videoRef.current) {
           videoRef.current.play();
         }
-      } else if (isSecondVideo && thirdVideoSrc) {
+      } 
+      // Second video ended
+      else if (currentVideoIndex === 2 && thirdVideoSrc) {
         setCurrentSrc(thirdVideoSrc);
+        setCurrentVideoIndex(3);
         if (videoRef.current) {
           videoRef.current.play();
         }
-      } else if (fourthVideoSrc) {
+      } 
+      // Third video ended
+      else if (currentVideoIndex === 3 && fourthVideoSrc) {
         setCurrentSrc(fourthVideoSrc);
+        setCurrentVideoIndex(4);
         if (videoRef.current) {
           videoRef.current.play();
         }
@@ -89,7 +97,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
         video.removeEventListener('ended', handleEnded);
       }
     };
-  }, [nextVideoSrc, thirdVideoSrc, fourthVideoSrc, isSecondVideo, dayAssets.sound]);
+  }, [currentVideoIndex, nextVideoSrc, thirdVideoSrc, fourthVideoSrc, dayAssets.sound]);
 
   const handlePlayPause = () => {
     if (videoRef.current) {
