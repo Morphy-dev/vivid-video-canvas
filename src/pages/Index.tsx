@@ -1,4 +1,6 @@
 
+import VideoCanvas from '../components/VideoCanvas';
+
 const Index = () => {
   return (
     <div className="min-h-screen bg-soft-gray flex items-center justify-center p-8">
