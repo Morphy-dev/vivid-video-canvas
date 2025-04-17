@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useEffect } from 'react';
 import VideoControls from './VideoControls';
 
@@ -7,18 +6,22 @@ interface VideoCanvasProps {
   className?: string;
   autoPlay?: boolean;
   nextVideoSrc?: string;
+  thirdVideoSrc?: string;
 }
 
 const VideoCanvas: React.FC<VideoCanvasProps> = ({ 
   src, 
   className = '',
   autoPlay = false,
-  nextVideoSrc
+  nextVideoSrc,
+  thirdVideoSrc
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const nextVideoRef = useRef<HTMLVideoElement>(null);
+  const thirdVideoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(autoPlay);
   const [currentSrc, setCurrentSrc] = useState(src);
+  const [isSecondVideo, setIsSecondVideo] = useState(false);
 
   useEffect(() => {
     if (videoRef.current && autoPlay) {
@@ -28,8 +31,14 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
 
   useEffect(() => {
     const handleEnded = () => {
-      if (nextVideoSrc) {
+      if (!isSecondVideo && nextVideoSrc) {
         setCurrentSrc(nextVideoSrc);
+        setIsSecondVideo(true);
+        if (videoRef.current) {
+          videoRef.current.play();
+        }
+      } else if (isSecondVideo && thirdVideoSrc) {
+        setCurrentSrc(thirdVideoSrc);
         if (videoRef.current) {
           videoRef.current.play();
         }
@@ -46,7 +55,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
         video.removeEventListener('ended', handleEnded);
       }
     };
-  }, [nextVideoSrc]);
+  }, [nextVideoSrc, thirdVideoSrc, isSecondVideo]);
 
   const handlePlayPause = () => {
     if (videoRef.current) {
@@ -83,6 +92,14 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
         <video 
           ref={nextVideoRef}
           src={nextVideoSrc}
+          className="hidden"
+          preload="auto"
+        />
+      )}
+      {thirdVideoSrc && (
+        <video 
+          ref={thirdVideoRef}
+          src={thirdVideoSrc}
           className="hidden"
           preload="auto"
         />
