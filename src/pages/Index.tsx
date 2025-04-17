@@ -5,12 +5,10 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-soft-gray flex items-center justify-center p-4">
       <div className="w-full max-w-5xl">
-        <h1 className="text-3xl font-bold text-center mb-6 text-dark-charcoal">
-          Vivid Video Canvas
-        </h1>
         <VideoCanvas 
-          src="/placeholder-video.mp4" 
+          src="https://ksnyoasamhyunakuqdst.supabase.co/storage/v1/object/sign/videos/Semana01_Escena01.mp4?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJ2aWRlb3MvU2VtYW5hMDFfRXNjZW5hMDEubXA0IiwiaWF0IjoxNzQ0OTE4MzkzLCJleHAiOjE3NDU1MjMxOTN9.08UzsY3CUHuhI9dW2RiRs1xPCRdnjLJXFv82Tsb-2ro" 
           className="animate-fade-in"
+          autoPlay
         />
       </div>
     </div>

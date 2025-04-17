@@ -1,18 +1,25 @@
-
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import VideoControls from './VideoControls';
 
 interface VideoCanvasProps {
   src: string;
   className?: string;
+  autoPlay?: boolean;
 }
 
 const VideoCanvas: React.FC<VideoCanvasProps> = ({ 
   src, 
-  className = '' 
+  className = '',
+  autoPlay = false
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(autoPlay);
+
+  useEffect(() => {
+    if (videoRef.current && autoPlay) {
+      videoRef.current.play();
+    }
+  }, [autoPlay]);
 
   const handlePlayPause = () => {
     if (videoRef.current) {
@@ -42,6 +49,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
         src={src}
         className="w-full h-auto object-cover"
         onClick={handlePlayPause}
+        autoPlay={autoPlay}
       />
       <VideoControls 
         isPlaying={isPlaying} 
