@@ -86,7 +86,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
           onClick={handlePlayPause} 
           autoPlay={autoPlay} 
           preload="auto" 
-          className="absolute inset-0 w-[90%] h-[90%] top-[5%] left-[5%] object-contain" 
+          className="absolute inset-0 w-full h-full object-contain" 
         />
         
         {nextVideoSrc && <video ref={nextVideoRef} src={nextVideoSrc} className="hidden" preload="auto" />}
