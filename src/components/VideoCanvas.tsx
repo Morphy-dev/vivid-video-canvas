@@ -126,8 +126,8 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
         {showOverlay && (
           <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
             <img 
-              src="/lovable-uploads/e1cd4230-56a7-4eb7-aacc-ce7f48d1b06c.png" 
-              alt="Today is Thursday" 
+              src={dayAssets.image}
+              alt="Day of the week" 
               className="max-w-full max-h-full object-contain animate-fade-in" 
             />
           </div>
