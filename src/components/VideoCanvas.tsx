@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useEffect } from 'react';
 import VideoControls from './VideoControls';
 import { getCurrentDayAssets } from '../utils/dayAssets';
@@ -9,6 +8,7 @@ interface VideoCanvasProps {
   autoPlay?: boolean;
   nextVideoSrc?: string;
   thirdVideoSrc?: string;
+  fourthVideoSrc?: string;
 }
 
 const VideoCanvas: React.FC<VideoCanvasProps> = ({
@@ -16,11 +16,13 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   className = '',
   autoPlay = false,
   nextVideoSrc,
-  thirdVideoSrc
+  thirdVideoSrc,
+  fourthVideoSrc
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const nextVideoRef = useRef<HTMLVideoElement>(null);
   const thirdVideoRef = useRef<HTMLVideoElement>(null);
+  const fourthVideoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(autoPlay);
   const [currentSrc, setCurrentSrc] = useState(src);
@@ -28,7 +30,6 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   const [showOverlay, setShowOverlay] = useState(false);
   const dayAssets = getCurrentDayAssets();
 
-  // Force audio loading on component mount
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.src = dayAssets.sound;
@@ -47,7 +48,6 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
       if (!isSecondVideo && nextVideoSrc) {
         setShowOverlay(true);
         
-        // Play audio immediately when showing the overlay
         if (audioRef.current) {
           try {
             console.log("Attempting to play audio:", dayAssets.sound);
@@ -59,7 +59,6 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
           }
         }
         
-        // Wait for 4 seconds before continuing to next video
         await new Promise(resolve => setTimeout(resolve, 4000));
         
         setShowOverlay(false);
@@ -70,6 +69,11 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
         }
       } else if (isSecondVideo && thirdVideoSrc) {
         setCurrentSrc(thirdVideoSrc);
+        if (videoRef.current) {
+          videoRef.current.play();
+        }
+      } else if (fourthVideoSrc) {
+        setCurrentSrc(fourthVideoSrc);
         if (videoRef.current) {
           videoRef.current.play();
         }
@@ -85,7 +89,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
         video.removeEventListener('ended', handleEnded);
       }
     };
-  }, [nextVideoSrc, thirdVideoSrc, isSecondVideo, dayAssets.sound]);
+  }, [nextVideoSrc, thirdVideoSrc, fourthVideoSrc, isSecondVideo, dayAssets.sound]);
 
   const handlePlayPause = () => {
     if (videoRef.current) {
@@ -122,6 +126,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
         
         {nextVideoSrc && <video ref={nextVideoRef} src={nextVideoSrc} className="hidden" preload="auto" />}
         {thirdVideoSrc && <video ref={thirdVideoRef} src={thirdVideoSrc} className="hidden" preload="auto" />}
+        {fourthVideoSrc && <video ref={fourthVideoRef} src={fourthVideoSrc} className="hidden" preload="auto" />}
         
         {showOverlay && (
           <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
