@@ -1,3 +1,4 @@
+
 import React, { useRef, useState, useEffect } from 'react';
 import VideoControls from './VideoControls';
 
@@ -79,36 +80,49 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   };
 
   return (
-    <div className={`relative w-full max-w-4xl mx-auto rounded-xl overflow-hidden shadow-2xl ${className}`}>
-      <video 
-        ref={videoRef}
-        src={currentSrc}
-        className="w-full h-auto object-cover"
-        onClick={handlePlayPause}
-        autoPlay={autoPlay}
-        preload="auto"
-      />
-      {nextVideoSrc && (
+    <div className={`relative w-full max-w-4xl mx-auto overflow-hidden ${className}`}>
+      <div className="relative w-full aspect-video">
+        {/* Main video */}
         <video 
-          ref={nextVideoRef}
-          src={nextVideoSrc}
-          className="hidden"
+          ref={videoRef}
+          src={currentSrc}
+          className="w-full h-full object-cover"
+          onClick={handlePlayPause}
+          autoPlay={autoPlay}
           preload="auto"
         />
-      )}
-      {thirdVideoSrc && (
-        <video 
-          ref={thirdVideoRef}
-          src={thirdVideoSrc}
-          className="hidden"
-          preload="auto"
+        
+        {/* Preload next videos */}
+        {nextVideoSrc && (
+          <video 
+            ref={nextVideoRef}
+            src={nextVideoSrc}
+            className="hidden"
+            preload="auto"
+          />
+        )}
+        {thirdVideoSrc && (
+          <video 
+            ref={thirdVideoRef}
+            src={thirdVideoSrc}
+            className="hidden"
+            preload="auto"
+          />
+        )}
+        
+        {/* Frame overlay */}
+        <img 
+          src="/lovable-uploads/7eb4c391-0a60-485b-8489-d1e842d5e45a.png"
+          alt="Video frame"
+          className="absolute top-0 left-0 w-full h-full pointer-events-none"
         />
-      )}
-      <VideoControls 
-        isPlaying={isPlaying} 
-        onPlayPause={handlePlayPause}
-        onFullscreen={handleFullscreen}
-      />
+        
+        <VideoControls 
+          isPlaying={isPlaying} 
+          onPlayPause={handlePlayPause}
+          onFullscreen={handleFullscreen}
+        />
+      </div>
     </div>
   );
 };
