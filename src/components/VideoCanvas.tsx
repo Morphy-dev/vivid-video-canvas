@@ -38,8 +38,20 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
     const handleEnded = async () => {
       if (!isSecondVideo && nextVideoSrc) {
         setShowDayImage(true);
+        
+        // Make sure the audio element is properly loaded and play it
         if (audioRef.current) {
-          audioRef.current.play();
+          audioRef.current.currentTime = 0; // Reset to beginning
+          
+          // Create a promise to play the audio
+          const playPromise = audioRef.current.play();
+          
+          // Handle potential play() promise rejection (browser policy)
+          if (playPromise !== undefined) {
+            playPromise.catch(error => {
+              console.error("Audio playback error:", error);
+            });
+          }
         }
         
         // Wait for 4 seconds before starting the next video
@@ -116,7 +128,13 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
           </div>
         )}
         
-        <audio ref={audioRef} src={dayAssets.sound} preload="auto" />
+        {/* Preload the audio and make it visible for debugging */}
+        <audio 
+          ref={audioRef} 
+          src={dayAssets.sound} 
+          preload="auto" 
+          controls={false} 
+        />
         
         <VideoControls isPlaying={isPlaying} onPlayPause={handlePlayPause} onFullscreen={handleFullscreen} />
       </div>
@@ -125,4 +143,3 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
 };
 
 export default VideoCanvas;
-

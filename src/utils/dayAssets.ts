@@ -18,7 +18,7 @@ const dayAssets: Record<string, DayAssets> = {
     image: "https://ksnyoasamhyunakuqdst.supabase.co/storage/v1/object/sign/other/wednesday.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJvdGhlci93ZWRuZXNkYXkucG5nIiwiaWF0IjoxNzQ0OTI4MjA2LCJleHAiOjE3NDU1MzMwMDZ9.nQp_Nso6e_7S4-7nHEq9P45PbFFumrNQIMFz92YKrug"
   },
   thursday: {
-    sound: "https://ksnyoasamhyunakuqdst.supabase.co/storage/v1/object/sign/other/thursday.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJvdGhlci90aHVyc2RheS5wbmciLCJpYXQiOjE3NDQ5MjgyMjcsImV4cCI6MTc0NTUzMzAyN30.JCnFrP_vkvcVi3zItgi5-7xrY-29OFt2K256JfZb7o4",
+    sound: "https://ksnyoasamhyunakuqdst.supabase.co/storage/v1/object/sign/audios/S1-01-04.mp3?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJhdWRpb3MvUzEtMDEtMDQubXAzIiwiaWF0IjoxNzQ0OTI4MjI3LCJleHAiOjE3NDU1MzMwMjd9.JCnFrP_vkvcVi3zItgi5-7xrY-29OFt2K256JfZb7o4",
     image: "https://ksnyoasamhyunakuqdst.supabase.co/storage/v1/object/sign/other/thursday.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJvdGhlci90aHVyc2RheS5wbmciLCJpYXQiOjE3NDQ5MjgyNDAsImV4cCI6MTc0NTUzMzA0MH0.GWST5hNECX0Ghdduw6B4AVhDmoVitqp5HweB53Q9w18"
   },
   friday: {
@@ -40,4 +40,3 @@ export const getCurrentDayAssets = (): DayAssets => {
   const currentDay = days[new Date().getDay()];
   return dayAssets[currentDay];
 };
-
