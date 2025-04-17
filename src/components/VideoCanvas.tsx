@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useEffect } from 'react';
 import VideoControls from './VideoControls';
 import { getCurrentDayAssets } from '../utils/dayAssets';
@@ -10,6 +9,7 @@ interface VideoCanvasProps {
   nextVideoSrc?: string;
   thirdVideoSrc?: string;
   fourthVideoSrc?: string;
+  fifthVideoSrc?: string;
 }
 
 const VideoCanvas: React.FC<VideoCanvasProps> = ({
@@ -18,16 +18,18 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   autoPlay = false,
   nextVideoSrc,
   thirdVideoSrc,
-  fourthVideoSrc
+  fourthVideoSrc,
+  fifthVideoSrc
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const nextVideoRef = useRef<HTMLVideoElement>(null);
   const thirdVideoRef = useRef<HTMLVideoElement>(null);
   const fourthVideoRef = useRef<HTMLVideoElement>(null);
+  const fifthVideoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(autoPlay);
   const [currentSrc, setCurrentSrc] = useState(src);
-  const [currentVideoIndex, setCurrentVideoIndex] = useState(1); // Track which video is playing (1-4)
+  const [currentVideoIndex, setCurrentVideoIndex] = useState(1);
   const [showOverlay, setShowOverlay] = useState(false);
   const dayAssets = getCurrentDayAssets();
 
@@ -46,7 +48,6 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
 
   useEffect(() => {
     const handleEnded = async () => {
-      // First video ended
       if (currentVideoIndex === 1 && nextVideoSrc) {
         setShowOverlay(true);
         
@@ -70,7 +71,6 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
           videoRef.current.play();
         }
       } 
-      // Second video ended
       else if (currentVideoIndex === 2 && thirdVideoSrc) {
         setCurrentSrc(thirdVideoSrc);
         setCurrentVideoIndex(3);
@@ -78,10 +78,16 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
           videoRef.current.play();
         }
       } 
-      // Third video ended
       else if (currentVideoIndex === 3 && fourthVideoSrc) {
         setCurrentSrc(fourthVideoSrc);
         setCurrentVideoIndex(4);
+        if (videoRef.current) {
+          videoRef.current.play();
+        }
+      }
+      else if (currentVideoIndex === 4 && fifthVideoSrc) {
+        setCurrentSrc(fifthVideoSrc);
+        setCurrentVideoIndex(5);
         if (videoRef.current) {
           videoRef.current.play();
         }
@@ -97,7 +103,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
         video.removeEventListener('ended', handleEnded);
       }
     };
-  }, [currentVideoIndex, nextVideoSrc, thirdVideoSrc, fourthVideoSrc, dayAssets.sound]);
+  }, [currentVideoIndex, nextVideoSrc, thirdVideoSrc, fourthVideoSrc, fifthVideoSrc, dayAssets.sound]);
 
   const handlePlayPause = () => {
     if (videoRef.current) {
@@ -135,6 +141,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
         {nextVideoSrc && <video ref={nextVideoRef} src={nextVideoSrc} className="hidden" preload="auto" />}
         {thirdVideoSrc && <video ref={thirdVideoRef} src={thirdVideoSrc} className="hidden" preload="auto" />}
         {fourthVideoSrc && <video ref={fourthVideoRef} src={fourthVideoSrc} className="hidden" preload="auto" />}
+        {fifthVideoSrc && <video ref={fifthVideoRef} src={fifthVideoSrc} className="hidden" preload="auto" />}
         
         {showOverlay && (
           <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
