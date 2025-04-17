@@ -91,12 +91,6 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
         {nextVideoSrc && <video ref={nextVideoRef} src={nextVideoSrc} className="hidden" preload="auto" />}
         {thirdVideoSrc && <video ref={thirdVideoRef} src={thirdVideoSrc} className="hidden" preload="auto" />}
         
-        <img 
-          src="/lovable-uploads/7eb4c391-0a60-485b-8489-d1e842d5e45a.png" 
-          alt="Video frame" 
-          className="absolute -top-[3.5%] -left-[2.5%] w-[105%] h-[107%] pointer-events-none z-10" 
-        />
-        
         <VideoControls isPlaying={isPlaying} onPlayPause={handlePlayPause} onFullscreen={handleFullscreen} />
       </div>
     </div>
