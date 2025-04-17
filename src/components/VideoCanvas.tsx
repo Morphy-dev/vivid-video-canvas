@@ -1,5 +1,7 @@
+
 import React, { useRef, useState, useEffect } from 'react';
 import VideoControls from './VideoControls';
+import { getCurrentDayAssets } from '../utils/dayAssets';
 
 interface VideoCanvasProps {
   src: string;
@@ -19,9 +21,12 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const nextVideoRef = useRef<HTMLVideoElement>(null);
   const thirdVideoRef = useRef<HTMLVideoElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(autoPlay);
   const [currentSrc, setCurrentSrc] = useState(src);
   const [isSecondVideo, setIsSecondVideo] = useState(false);
+  const [showDayImage, setShowDayImage] = useState(false);
+  const dayAssets = getCurrentDayAssets();
 
   useEffect(() => {
     if (videoRef.current && autoPlay) {
@@ -30,8 +35,17 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   }, [autoPlay]);
 
   useEffect(() => {
-    const handleEnded = () => {
+    const handleEnded = async () => {
       if (!isSecondVideo && nextVideoSrc) {
+        setShowDayImage(true);
+        if (audioRef.current) {
+          audioRef.current.play();
+        }
+        
+        // Wait for 4 seconds before starting the next video
+        await new Promise(resolve => setTimeout(resolve, 4000));
+        
+        setShowDayImage(false);
         setCurrentSrc(nextVideoSrc);
         setIsSecondVideo(true);
         if (videoRef.current) {
@@ -44,6 +58,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
         }
       }
     };
+
     const video = videoRef.current;
     if (video) {
       video.addEventListener('ended', handleEnded);
@@ -91,6 +106,18 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
         {nextVideoSrc && <video ref={nextVideoRef} src={nextVideoSrc} className="hidden" preload="auto" />}
         {thirdVideoSrc && <video ref={thirdVideoRef} src={thirdVideoSrc} className="hidden" preload="auto" />}
         
+        {showDayImage && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black">
+            <img 
+              src={dayAssets.image} 
+              alt="Day specific" 
+              className="max-w-full max-h-full object-contain animate-fade-in" 
+            />
+          </div>
+        )}
+        
+        <audio ref={audioRef} src={dayAssets.sound} preload="auto" />
+        
         <VideoControls isPlaying={isPlaying} onPlayPause={handlePlayPause} onFullscreen={handleFullscreen} />
       </div>
     </div>
@@ -98,3 +125,4 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
 };
 
 export default VideoCanvas;
+
