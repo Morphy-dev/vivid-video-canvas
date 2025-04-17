@@ -1,3 +1,4 @@
+
 import React, { useRef, useState, useEffect } from 'react';
 import VideoControls from './VideoControls';
 import { getCurrentDayAssets } from '../utils/dayAssets';
@@ -27,6 +28,13 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   const [showDayImage, setShowDayImage] = useState(false);
   const dayAssets = getCurrentDayAssets();
 
+  // Preload audio
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.load();
+    }
+  }, []);
+
   useEffect(() => {
     if (videoRef.current && autoPlay) {
       videoRef.current.play();
@@ -38,15 +46,28 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
       if (!isSecondVideo && nextVideoSrc) {
         setShowDayImage(true);
         
+        // Play the audio synchronously with the image display
         if (audioRef.current) {
           try {
-            audioRef.current.currentTime = 0;
-            await audioRef.current.play();
+            // Explicitly set the source again to ensure it's loaded
+            const dayAssets = getCurrentDayAssets();
+            audioRef.current.src = dayAssets.sound;
+            audioRef.current.load();
+            audioRef.current.volume = 1.0; // Ensure volume is at maximum
+            console.log("Attempting to play audio:", dayAssets.sound);
+            
+            const playPromise = audioRef.current.play();
+            if (playPromise !== undefined) {
+              playPromise.catch(error => {
+                console.error("Audio playback error:", error);
+              });
+            }
           } catch (error) {
-            console.error("Audio playback error:", error);
+            console.error("Audio setup error:", error);
           }
         }
         
+        // Wait for 4 seconds before continuing to next video
         await new Promise(resolve => setTimeout(resolve, 4000));
         
         setShowDayImage(false);
@@ -120,11 +141,11 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
           </div>
         )}
         
+        {/* Audio element with controls for testing purposes */}
         <audio 
           ref={audioRef} 
-          src={dayAssets.sound} 
-          preload="auto" 
-          className="hidden"
+          src={dayAssets.sound}
+          preload="auto"
         />
         
         <VideoControls isPlaying={isPlaying} onPlayPause={handlePlayPause} onFullscreen={handleFullscreen} />
