@@ -1,3 +1,4 @@
+
 import React, { useRef, useState, useEffect } from 'react';
 import VideoControls from './VideoControls';
 
@@ -94,7 +95,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
         <img 
           src="/lovable-uploads/7eb4c391-0a60-485b-8489-d1e842d5e45a.png" 
           alt="Video frame" 
-          className="absolute inset-0 w-full h-full pointer-events-none z-10" 
+          className="absolute -top-[2.5%] -left-[2.5%] w-[105%] h-[105%] pointer-events-none z-10" 
         />
         
         <VideoControls isPlaying={isPlaying} onPlayPause={handlePlayPause} onFullscreen={handleFullscreen} />
@@ -104,3 +105,4 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
 };
 
 export default VideoCanvas;
+
