@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useEffect } from 'react';
 import VideoControls from './VideoControls';
 import { getCurrentDayAssets } from '../utils/dayAssets';
@@ -39,22 +38,15 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
       if (!isSecondVideo && nextVideoSrc) {
         setShowDayImage(true);
         
-        // Make sure the audio element is properly loaded and play it
         if (audioRef.current) {
-          audioRef.current.currentTime = 0; // Reset to beginning
-          
-          // Create a promise to play the audio
-          const playPromise = audioRef.current.play();
-          
-          // Handle potential play() promise rejection (browser policy)
-          if (playPromise !== undefined) {
-            playPromise.catch(error => {
-              console.error("Audio playback error:", error);
-            });
+          try {
+            audioRef.current.currentTime = 0;
+            await audioRef.current.play();
+          } catch (error) {
+            console.error("Audio playback error:", error);
           }
         }
         
-        // Wait for 4 seconds before starting the next video
         await new Promise(resolve => setTimeout(resolve, 4000));
         
         setShowDayImage(false);
@@ -128,12 +120,11 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
           </div>
         )}
         
-        {/* Preload the audio and make it visible for debugging */}
         <audio 
           ref={audioRef} 
           src={dayAssets.sound} 
           preload="auto" 
-          controls={false} 
+          className="hidden"
         />
         
         <VideoControls isPlaying={isPlaying} onPlayPause={handlePlayPause} onFullscreen={handleFullscreen} />
