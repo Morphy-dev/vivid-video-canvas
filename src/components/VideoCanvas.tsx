@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import VideoControls from './VideoControls';
 import { getCurrentDayAssets } from '../utils/dayAssets';
+import ConfettiGame from './ConfettiGame';
 
 interface VideoCanvasProps {
   src: string;
@@ -34,6 +35,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   const [currentSrc, setCurrentSrc] = useState(src);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(1);
   const [showOverlay, setShowOverlay] = useState(false);
+  const [showGame, setShowGame] = useState(false);
   const dayAssets = getCurrentDayAssets();
 
   useEffect(() => {
@@ -102,6 +104,9 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
           videoRef.current.play();
         }
       }
+      else if (currentVideoIndex === 6) {
+        setShowGame(true);
+      }
     };
 
     const video = videoRef.current;
@@ -139,38 +144,44 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   return (
     <div className={`relative w-full max-w-6xl mx-auto ${className}`}>
       <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
-        <video 
-          ref={videoRef} 
-          src={currentSrc} 
-          onClick={handlePlayPause} 
-          autoPlay={autoPlay} 
-          preload="auto" 
-          className="absolute inset-0 w-full h-full object-contain" 
-        />
-        
-        {nextVideoSrc && <video ref={nextVideoRef} src={nextVideoSrc} className="hidden" preload="auto" />}
-        {thirdVideoSrc && <video ref={thirdVideoRef} src={thirdVideoSrc} className="hidden" preload="auto" />}
-        {fourthVideoSrc && <video ref={fourthVideoRef} src={fourthVideoSrc} className="hidden" preload="auto" />}
-        {fifthVideoSrc && <video ref={fifthVideoRef} src={fifthVideoSrc} className="hidden" preload="auto" />}
-        {sixthVideoSrc && <video ref={sixthVideoRef} src={sixthVideoSrc} className="hidden" preload="auto" />}
-        
-        {showOverlay && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <img 
-              src={dayAssets.image}
-              alt="Day of the week" 
-              className="max-w-full max-h-full object-contain animate-fade-in" 
+        {!showGame ? (
+          <>
+            <video 
+              ref={videoRef} 
+              src={currentSrc} 
+              onClick={handlePlayPause} 
+              autoPlay={autoPlay} 
+              preload="auto" 
+              className="absolute inset-0 w-full h-full object-contain" 
             />
-          </div>
+            
+            {nextVideoSrc && <video ref={nextVideoRef} src={nextVideoSrc} className="hidden" preload="auto" />}
+            {thirdVideoSrc && <video ref={thirdVideoRef} src={thirdVideoSrc} className="hidden" preload="auto" />}
+            {fourthVideoSrc && <video ref={fourthVideoRef} src={fourthVideoSrc} className="hidden" preload="auto" />}
+            {fifthVideoSrc && <video ref={fifthVideoRef} src={fifthVideoSrc} className="hidden" preload="auto" />}
+            {sixthVideoSrc && <video ref={sixthVideoRef} src={sixthVideoSrc} className="hidden" preload="auto" />}
+            
+            {showOverlay && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                <img 
+                  src={dayAssets.image}
+                  alt="Day of the week" 
+                  className="max-w-full max-h-full object-contain animate-fade-in" 
+                />
+              </div>
+            )}
+            
+            <audio 
+              ref={audioRef} 
+              src={dayAssets.sound}
+              preload="auto"
+            />
+            
+            <VideoControls isPlaying={isPlaying} onPlayPause={handlePlayPause} onFullscreen={handleFullscreen} />
+          </>
+        ) : (
+          <ConfettiGame />
         )}
-        
-        <audio 
-          ref={audioRef} 
-          src={dayAssets.sound}
-          preload="auto"
-        />
-        
-        <VideoControls isPlaying={isPlaying} onPlayPause={handlePlayPause} onFullscreen={handleFullscreen} />
       </div>
     </div>
   );
