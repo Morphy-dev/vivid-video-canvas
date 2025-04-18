@@ -8,6 +8,7 @@ const ConfettiGame = () => {
   const [score, setScore] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
   const [sessionId] = useState(() => crypto.randomUUID());
+  const [attemptNumber, setAttemptNumber] = useState(0);
 
   useEffect(() => {
     const spawnSquare = () => {
@@ -40,11 +41,15 @@ const ConfettiGame = () => {
           square.remove();
           setSquares(prev => prev.filter(s => s !== square));
           setScore(prev => prev + 1);
+          setAttemptNumber(prev => prev + 1);
           
           try {
-            await supabase.from('weather_play').insert([
-              { session_id: sessionId, action: 'square_clicked' }
-            ]);
+            await supabase.from('weather_play').insert({
+              session_id: sessionId,
+              attempt_number: attemptNumber + 1,
+              is_correct: true,
+              attempt_timestamp: new Date().toISOString()
+            });
           } catch (error) {
             console.error('Error recording score:', error);
           }
@@ -54,7 +59,7 @@ const ConfettiGame = () => {
 
     const interval = setInterval(spawnSquare, 1000);
     return () => clearInterval(interval);
-  }, [isGameOver, sessionId]);
+  }, [isGameOver, sessionId, attemptNumber]);
 
   return (
     <div className="relative w-full h-full bg-gray-900 overflow-hidden">
