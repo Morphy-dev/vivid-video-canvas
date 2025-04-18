@@ -1,7 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import VideoControls from './VideoControls';
 import { getCurrentDayAssets } from '../utils/dayAssets';
-import ConfettiCelebration from './ConfettiCelebration';
 
 interface VideoCanvasProps {
   src: string;
@@ -35,7 +34,6 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   const [currentSrc, setCurrentSrc] = useState(src);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(1);
   const [showOverlay, setShowOverlay] = useState(false);
-  const [showCelebration, setShowCelebration] = useState(false);
   const dayAssets = getCurrentDayAssets();
 
   useEffect(() => {
@@ -104,9 +102,6 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
           videoRef.current.play();
         }
       }
-      else if (currentVideoIndex === 6) {
-        setShowCelebration(true);
-      }
     };
 
     const video = videoRef.current;
@@ -140,10 +135,6 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
       }
     }
   };
-
-  if (showCelebration) {
-    return <ConfettiCelebration />;
-  }
 
   return (
     <div className={`relative w-full max-w-6xl mx-auto ${className}`}>
