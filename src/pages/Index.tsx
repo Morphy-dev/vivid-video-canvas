@@ -1,34 +1,52 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import VideoCanvas from '../components/VideoCanvas';
 import CodeEntry from '../components/CodeEntry';
 import StudentSelector from '../components/StudentSelector';
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface Student {
   id: string;
   nombre_completo: string;
   foto_url: string;
+  grupo_id: string;
+}
+
+interface School {
+  nombre: string;
 }
 
 const Index = () => {
   const [groupId, setGroupId] = useState<string | null>(null);
   const [students, setStudents] = useState<Student[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [schoolName, setSchoolName] = useState<string>('');
 
   const handleGroupFound = async (foundGroupId: string) => {
     try {
-      const { data, error } = await supabase
+      // Fetch students for the group
+      const { data: studentsData, error: studentsError } = await supabase
         .from('estudiantes')
-        .select('id, nombre_completo, foto_url')
+        .select('id, nombre_completo, foto_url, grupo_id')
         .eq('grupo_id', foundGroupId)
         .eq('status', true);
 
-      if (error) throw error;
-      setStudents(data || []);
+      // Fetch school name
+      const { data: groupData, error: groupError } = await supabase
+        .from('grupos')
+        .select('instituciones(nombre)')
+        .eq('id', foundGroupId)
+        .single();
+
+      if (studentsError) throw studentsError;
+      if (groupError) throw groupError;
+
+      setStudents(studentsData || []);
+      setSchoolName(groupData?.instituciones?.nombre || 'Escuela no encontrada');
       setGroupId(foundGroupId);
     } catch (error) {
-      console.error('Error fetching students:', error);
+      console.error('Error fetching students or school:', error);
     }
   };
 
@@ -53,7 +71,24 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-soft-gray flex items-center justify-center p-8">
+    <div className="min-h-screen bg-soft-gray relative flex items-center justify-center p-8">
+      {/* Student and School Info in Top Right Corner */}
+      <div className="absolute top-4 right-4 text-right z-10">
+        <div className="flex items-center justify-end space-x-2">
+          <Avatar className="w-12 h-12">
+            <AvatarImage 
+              src={selectedStudent.foto_url || '/placeholder.svg'} 
+              alt={selectedStudent.nombre_completo} 
+            />
+            <AvatarFallback>{selectedStudent.nombre_completo.charAt(0)}</AvatarFallback>
+          </Avatar>
+          <div>
+            <p className="font-semibold text-sm">{selectedStudent.nombre_completo}</p>
+            <p className="text-xs text-gray-500">{schoolName}</p>
+          </div>
+        </div>
+      </div>
+
       <div className="w-full max-w-[90vw]">
         <VideoCanvas 
           src="https://ksnyoasamhyunakuqdst.supabase.co/storage/v1/object/sign/videos/Semana01_Escena01.mp4?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJ2aWRlb3MvU2VtYW5hMDFfRXNjZW5hMDEubXA0IiwiaWF0IjoxNzQ0OTE4MzkzLCJleHAiOjE3NDU1MjMxOTN9.08UzsY3CUHuhI9dW2RiRs1xPCRdnjLJXFv82Tsb-2ro" 
