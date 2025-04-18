@@ -41,79 +41,77 @@ export const useVideoSequence = ({
   
   const { recordProgress } = useVideoProgress(studentId, sessionId);
 
-  useEffect(() => {
-    const handleEnded = async () => {
-      if (currentVideoIndex === 1 && nextVideoSrc) {
-        await recordProgress(initialSrc, true);
-        setShowOverlay(true);
-        
-        if (audioRef.current) {
-          try {
-            audioRef.current.currentTime = 0;
-            audioRef.current.volume = 1.0;
-            await audioRef.current.play();
-          } catch (error) {
-            console.error("Audio playback error:", error);
-          }
+  const playNextVideo = async (nextSrc: string, nextIndex: number) => {
+    setCurrentSrc(nextSrc);
+    setCurrentVideoIndex(nextIndex);
+    await recordProgress(nextSrc);
+    if (videoRef.current) {
+      videoRef.current.play();
+    }
+  };
+
+  const handleOverlayTransition = async () => {
+    setShowOverlay(true);
+    
+    if (audioRef.current) {
+      try {
+        audioRef.current.currentTime = 0;
+        audioRef.current.volume = 1.0;
+        await audioRef.current.play();
+      } catch (error) {
+        console.error("Audio playback error:", error);
+      }
+    }
+    
+    await new Promise(resolve => setTimeout(resolve, 4000));
+    setShowOverlay(false);
+  };
+
+  const handleVideoSequence = async (currentSrc: string, index: number) => {
+    await recordProgress(currentSrc, true);
+    
+    switch (index) {
+      case 1:
+        if (nextVideoSrc) {
+          await handleOverlayTransition();
+          await playNextVideo(nextVideoSrc, 2);
         }
-        
-        await new Promise(resolve => setTimeout(resolve, 4000));
-        
-        setShowOverlay(false);
-        setCurrentSrc(nextVideoSrc);
-        setCurrentVideoIndex(2);
-        await recordProgress(nextVideoSrc);
-        if (videoRef.current) {
-          videoRef.current.play();
-        }
-      } else if (currentVideoIndex === 2 && thirdVideoSrc) {
-        await recordProgress(nextVideoSrc!, true);
-        setCurrentSrc(thirdVideoSrc);
-        setCurrentVideoIndex(3);
-        await recordProgress(thirdVideoSrc);
-        if (videoRef.current) {
-          videoRef.current.play();
-        }
-      } else if (currentVideoIndex === 3 && fourthVideoSrc) {
-        await recordProgress(thirdVideoSrc!, true);
-        setCurrentSrc(fourthVideoSrc);
-        setCurrentVideoIndex(4);
-        await recordProgress(fourthVideoSrc);
-        if (videoRef.current) {
-          videoRef.current.play();
-        }
-      } else if (currentVideoIndex === 4 && fifthVideoSrc) {
-        await recordProgress(fourthVideoSrc!, true);
-        setCurrentSrc(fifthVideoSrc);
-        setCurrentVideoIndex(5);
-        await recordProgress(fifthVideoSrc);
-        if (videoRef.current) {
-          videoRef.current.play();
-        }
-      } else if (currentVideoIndex === 5 && sixthVideoSrc) {
-        await recordProgress(fifthVideoSrc!, true);
-        setCurrentSrc(sixthVideoSrc);
-        setCurrentVideoIndex(6);
-        await recordProgress(sixthVideoSrc);
-        if (videoRef.current) {
-          videoRef.current.play();
-        }
-      } else if (currentVideoIndex === 6) {
+        break;
+      case 2:
+        if (thirdVideoSrc) await playNextVideo(thirdVideoSrc, 3);
+        break;
+      case 3:
+        if (fourthVideoSrc) await playNextVideo(fourthVideoSrc, 4);
+        break;
+      case 4:
+        if (fifthVideoSrc) await playNextVideo(fifthVideoSrc, 5);
+        break;
+      case 5:
+        if (sixthVideoSrc) await playNextVideo(sixthVideoSrc, 6);
+        break;
+      case 6:
         await recordProgress(sixthVideoSrc!, true);
         setShowIframe(true);
-      }
+        break;
+    }
+  };
+
+  useEffect(() => {
+    const handleEnded = () => {
+      handleVideoSequence(currentSrc, currentVideoIndex);
     };
 
     const video = videoRef.current;
     if (video) {
       video.addEventListener('ended', handleEnded);
     }
+    
     return () => {
       if (video) {
         video.removeEventListener('ended', handleEnded);
       }
     };
-  }, [currentVideoIndex, nextVideoSrc, thirdVideoSrc, fourthVideoSrc, fifthVideoSrc, sixthVideoSrc, initialSrc, recordProgress, videoRef, audioRef]);
+  }, [currentVideoIndex, nextVideoSrc, thirdVideoSrc, fourthVideoSrc, fifthVideoSrc, sixthVideoSrc, currentSrc]);
 
   useEffect(() => {
     if (studentId) {
@@ -128,4 +126,3 @@ export const useVideoSequence = ({
     showIframe
   };
 };
-
