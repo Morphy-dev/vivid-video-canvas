@@ -154,7 +154,6 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   }, [currentVideoIndex, nextVideoSrc, thirdVideoSrc, fourthVideoSrc, fifthVideoSrc, sixthVideoSrc, dayAssets.sound, src]);
 
   useEffect(() => {
-    // Record start of first video when component mounts
     if (studentId) {
       recordProgress(src);
     }
@@ -221,7 +220,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
           </>
         ) : (
           <iframe
-            src="https://preview--confetti-square-celebration.lovable.app/"
+            src={`https://preview--confetti-square-celebration.lovable.app/?sessionId=${sessionId}&studentId=${studentId}`}
             frameBorder="0"
             width="100%"
             height="100%"

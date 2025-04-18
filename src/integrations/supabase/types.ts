@@ -625,6 +625,7 @@ export type Database = {
           id: string
           is_correct: boolean
           session_id: string
+          student_id: string | null
         }
         Insert: {
           attempt_number: number
@@ -632,6 +633,7 @@ export type Database = {
           id?: string
           is_correct: boolean
           session_id: string
+          student_id?: string | null
         }
         Update: {
           attempt_number?: number
@@ -639,6 +641,7 @@ export type Database = {
           id?: string
           is_correct?: boolean
           session_id?: string
+          student_id?: string | null
         }
         Relationships: []
       }
