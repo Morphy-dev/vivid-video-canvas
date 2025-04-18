@@ -1,3 +1,4 @@
+
 import React, { useRef, useState, useEffect } from 'react';
 import VideoControls from './VideoControls';
 import { getCurrentDayAssets } from '../utils/dayAssets';
@@ -34,6 +35,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   const [currentSrc, setCurrentSrc] = useState(src);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(1);
   const [showOverlay, setShowOverlay] = useState(false);
+  const dayAssets = getCurrentDayAssets();
 
   useEffect(() => {
     if (audioRef.current) {
