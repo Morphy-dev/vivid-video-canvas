@@ -518,6 +518,41 @@ export type Database = {
           },
         ]
       }
+      student_progress: {
+        Row: {
+          activity: string
+          completed_at: string | null
+          id: string
+          session_id: string | null
+          started_at: string
+          student_id: string
+        }
+        Insert: {
+          activity: string
+          completed_at?: string | null
+          id?: string
+          session_id?: string | null
+          started_at?: string
+          student_id: string
+        }
+        Update: {
+          activity?: string
+          completed_at?: string | null
+          id?: string
+          session_id?: string | null
+          started_at?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_progress_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "estudiantes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       videos: {
         Row: {
           created_at: string | null

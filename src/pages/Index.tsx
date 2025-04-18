@@ -99,6 +99,7 @@ const Index = () => {
           sixthVideoSrc="https://ksnyoasamhyunakuqdst.supabase.co/storage/v1/object/sign/videos/Semana01_Escena%2006%20v3.mp4?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJ2aWRlb3MvU2VtYW5hMDFfRXNjZW5hIDA2IHYzLm1wNCIsImlhdCI6MTc0NDkzODIxMiwiZXhwIjoxNzQ1NTQzMDEyfQ.Z4t2GKCWlko5snQ-7Z_V1f_nf0E1IcIDgp8U3HKjqsU"
           className="animate-fade-in"
           autoPlay
+          studentId={selectedStudent?.id}
         />
       </div>
     </div>

@@ -1,7 +1,7 @@
-
 import React, { useRef, useState, useEffect } from 'react';
 import VideoControls from './VideoControls';
 import { getCurrentDayAssets } from '../utils/dayAssets';
+import { supabase } from "@/integrations/supabase/client";
 
 interface VideoCanvasProps {
   src: string;
@@ -12,6 +12,7 @@ interface VideoCanvasProps {
   fourthVideoSrc?: string;
   fifthVideoSrc?: string;
   sixthVideoSrc?: string;
+  studentId?: string;
 }
 
 const VideoCanvas: React.FC<VideoCanvasProps> = ({
@@ -22,7 +23,8 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   thirdVideoSrc,
   fourthVideoSrc,
   fifthVideoSrc,
-  sixthVideoSrc
+  sixthVideoSrc,
+  studentId
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const nextVideoRef = useRef<HTMLVideoElement>(null);
@@ -37,6 +39,31 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   const [showOverlay, setShowOverlay] = useState(false);
   const [showIframe, setShowIframe] = useState(false);
   const dayAssets = getCurrentDayAssets();
+
+  const [sessionId] = useState(() => crypto.randomUUID());
+
+  const recordProgress = async (videoSrc: string, completed: boolean = false) => {
+    if (!studentId) return;
+
+    try {
+      const videoName = videoSrc.split('/').pop()?.split('?')[0] || 'unknown';
+      
+      const { error } = await supabase
+        .from('student_progress')
+        .insert({
+          session_id: sessionId,
+          student_id: studentId,
+          activity: videoName,
+          completed_at: completed ? new Date().toISOString() : null
+        });
+
+      if (error) {
+        console.error('Error recording progress:', error);
+      }
+    } catch (error) {
+      console.error('Error recording progress:', error);
+    }
+  };
 
   useEffect(() => {
     if (audioRef.current) {
@@ -54,6 +81,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   useEffect(() => {
     const handleEnded = async () => {
       if (currentVideoIndex === 1 && nextVideoSrc) {
+        await recordProgress(src, true);
         setShowOverlay(true);
         
         if (audioRef.current) {
@@ -72,39 +100,44 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
         setShowOverlay(false);
         setCurrentSrc(nextVideoSrc);
         setCurrentVideoIndex(2);
+        await recordProgress(nextVideoSrc);
         if (videoRef.current) {
           videoRef.current.play();
         }
-      } 
-      else if (currentVideoIndex === 2 && thirdVideoSrc) {
+      } else if (currentVideoIndex === 2 && thirdVideoSrc) {
+        await recordProgress(nextVideoSrc!, true);
         setCurrentSrc(thirdVideoSrc);
         setCurrentVideoIndex(3);
+        await recordProgress(thirdVideoSrc);
         if (videoRef.current) {
           videoRef.current.play();
         }
-      } 
-      else if (currentVideoIndex === 3 && fourthVideoSrc) {
+      } else if (currentVideoIndex === 3 && fourthVideoSrc) {
+        await recordProgress(thirdVideoSrc!, true);
         setCurrentSrc(fourthVideoSrc);
         setCurrentVideoIndex(4);
+        await recordProgress(fourthVideoSrc);
         if (videoRef.current) {
           videoRef.current.play();
         }
-      }
-      else if (currentVideoIndex === 4 && fifthVideoSrc) {
+      } else if (currentVideoIndex === 4 && fifthVideoSrc) {
+        await recordProgress(fourthVideoSrc!, true);
         setCurrentSrc(fifthVideoSrc);
         setCurrentVideoIndex(5);
+        await recordProgress(fifthVideoSrc);
         if (videoRef.current) {
           videoRef.current.play();
         }
-      }
-      else if (currentVideoIndex === 5 && sixthVideoSrc) {
+      } else if (currentVideoIndex === 5 && sixthVideoSrc) {
+        await recordProgress(fifthVideoSrc!, true);
         setCurrentSrc(sixthVideoSrc);
         setCurrentVideoIndex(6);
+        await recordProgress(sixthVideoSrc);
         if (videoRef.current) {
           videoRef.current.play();
         }
-      }
-      else if (currentVideoIndex === 6) {
+      } else if (currentVideoIndex === 6) {
+        await recordProgress(sixthVideoSrc!, true);
         setShowIframe(true);
       }
     };
@@ -118,7 +151,14 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
         video.removeEventListener('ended', handleEnded);
       }
     };
-  }, [currentVideoIndex, nextVideoSrc, thirdVideoSrc, fourthVideoSrc, fifthVideoSrc, sixthVideoSrc, dayAssets.sound]);
+  }, [currentVideoIndex, nextVideoSrc, thirdVideoSrc, fourthVideoSrc, fifthVideoSrc, sixthVideoSrc, dayAssets.sound, src]);
+
+  useEffect(() => {
+    // Record start of first video when component mounts
+    if (studentId) {
+      recordProgress(src);
+    }
+  }, [studentId, src]);
 
   const handlePlayPause = () => {
     if (videoRef.current) {
