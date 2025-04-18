@@ -1,6 +1,9 @@
+
 import React, { useRef, useState, useEffect } from 'react';
 import VideoControls from './VideoControls';
 import { getCurrentDayAssets } from '../utils/dayAssets';
+import ConfettiGame from './ConfettiGame';
+import { supabase } from '../integrations/supabase/client';
 
 interface VideoCanvasProps {
   src: string;
@@ -34,7 +37,31 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   const [currentSrc, setCurrentSrc] = useState(src);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(1);
   const [showOverlay, setShowOverlay] = useState(false);
+  const [showGame, setShowGame] = useState(false);
+  const [sessionId, setSessionId] = useState('');
   const dayAssets = getCurrentDayAssets();
+
+  // Generate a session ID when the component mounts (first video starts)
+  useEffect(() => {
+    const generateSessionId = async () => {
+      const newSessionId = crypto.randomUUID();
+      setSessionId(newSessionId);
+      
+      // Record the start of the session in weather_play
+      try {
+        await supabase.from('weather_play').insert({
+          session_id: newSessionId,
+          attempt_number: 0,
+          is_correct: true // This marks the session start
+        });
+        console.log("Session started with ID:", newSessionId);
+      } catch (error) {
+        console.error("Error recording session start:", error);
+      }
+    };
+    
+    generateSessionId();
+  }, []);
 
   useEffect(() => {
     if (audioRef.current) {
@@ -102,6 +129,10 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
           videoRef.current.play();
         }
       }
+      else if (currentVideoIndex === 6) {
+        // After the last video, show the game
+        setShowGame(true);
+      }
     };
 
     const video = videoRef.current;
@@ -135,6 +166,10 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
       }
     }
   };
+
+  if (showGame) {
+    return <ConfettiGame sessionId={sessionId} />;
+  }
 
   return (
     <div className={`relative w-full max-w-6xl mx-auto ${className}`}>
