@@ -1,10 +1,10 @@
 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState } from 'react';
 import VideoControls from './VideoControls';
 import VideoOverlay from './video/VideoOverlay';
 import PreloadedVideos from './video/PreloadedVideos';
 import GameFrame from './video/GameFrame';
-import useVideoProgress from '../hooks/useVideoProgress';
+import { useVideoSequence } from '../hooks/useVideoSequence';
 import { getCurrentDayAssets } from '../utils/dayAssets';
 
 interface VideoCanvasProps {
@@ -39,107 +39,22 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   const audioRef = useRef<HTMLAudioElement>(null);
   
   const [isPlaying, setIsPlaying] = useState(autoPlay);
-  const [currentSrc, setCurrentSrc] = useState(src);
-  const [currentVideoIndex, setCurrentVideoIndex] = useState(1);
-  const [showOverlay, setShowOverlay] = useState(false);
-  const [showIframe, setShowIframe] = useState(false);
   const [sessionId] = useState(() => crypto.randomUUID());
   
   const dayAssets = getCurrentDayAssets();
-  const { recordProgress } = useVideoProgress(studentId, sessionId);
 
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.src = dayAssets.sound;
-      audioRef.current.load();
-    }
-  }, [dayAssets.sound]);
-
-  useEffect(() => {
-    if (videoRef.current && autoPlay) {
-      videoRef.current.play();
-    }
-  }, [autoPlay]);
-
-  useEffect(() => {
-    const handleEnded = async () => {
-      if (currentVideoIndex === 1 && nextVideoSrc) {
-        await recordProgress(src, true);
-        setShowOverlay(true);
-        
-        if (audioRef.current) {
-          try {
-            audioRef.current.currentTime = 0;
-            audioRef.current.volume = 1.0;
-            await audioRef.current.play();
-          } catch (error) {
-            console.error("Audio playback error:", error);
-          }
-        }
-        
-        await new Promise(resolve => setTimeout(resolve, 4000));
-        
-        setShowOverlay(false);
-        setCurrentSrc(nextVideoSrc);
-        setCurrentVideoIndex(2);
-        await recordProgress(nextVideoSrc);
-        if (videoRef.current) {
-          videoRef.current.play();
-        }
-      } else if (currentVideoIndex === 2 && thirdVideoSrc) {
-        await recordProgress(nextVideoSrc!, true);
-        setCurrentSrc(thirdVideoSrc);
-        setCurrentVideoIndex(3);
-        await recordProgress(thirdVideoSrc);
-        if (videoRef.current) {
-          videoRef.current.play();
-        }
-      } else if (currentVideoIndex === 3 && fourthVideoSrc) {
-        await recordProgress(thirdVideoSrc!, true);
-        setCurrentSrc(fourthVideoSrc);
-        setCurrentVideoIndex(4);
-        await recordProgress(fourthVideoSrc);
-        if (videoRef.current) {
-          videoRef.current.play();
-        }
-      } else if (currentVideoIndex === 4 && fifthVideoSrc) {
-        await recordProgress(fourthVideoSrc!, true);
-        setCurrentSrc(fifthVideoSrc);
-        setCurrentVideoIndex(5);
-        await recordProgress(fifthVideoSrc);
-        if (videoRef.current) {
-          videoRef.current.play();
-        }
-      } else if (currentVideoIndex === 5 && sixthVideoSrc) {
-        await recordProgress(fifthVideoSrc!, true);
-        setCurrentSrc(sixthVideoSrc);
-        setCurrentVideoIndex(6);
-        await recordProgress(sixthVideoSrc);
-        if (videoRef.current) {
-          videoRef.current.play();
-        }
-      } else if (currentVideoIndex === 6) {
-        await recordProgress(sixthVideoSrc!, true);
-        setShowIframe(true);
-      }
-    };
-
-    const video = videoRef.current;
-    if (video) {
-      video.addEventListener('ended', handleEnded);
-    }
-    return () => {
-      if (video) {
-        video.removeEventListener('ended', handleEnded);
-      }
-    };
-  }, [currentVideoIndex, nextVideoSrc, thirdVideoSrc, fourthVideoSrc, fifthVideoSrc, sixthVideoSrc, dayAssets.sound, src, recordProgress]);
-
-  useEffect(() => {
-    if (studentId) {
-      recordProgress(src);
-    }
-  }, [studentId, src, recordProgress]);
+  const { currentSrc, showOverlay, showIframe } = useVideoSequence({
+    initialSrc: src,
+    nextVideoSrc,
+    thirdVideoSrc,
+    fourthVideoSrc,
+    fifthVideoSrc,
+    sixthVideoSrc,
+    studentId,
+    sessionId,
+    videoRef,
+    audioRef
+  });
 
   const handlePlayPause = () => {
     if (videoRef.current) {
@@ -204,3 +119,4 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
 };
 
 export default VideoCanvas;
+
