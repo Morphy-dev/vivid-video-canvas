@@ -10,6 +10,7 @@ interface VideoCanvasProps {
   thirdVideoSrc?: string;
   fourthVideoSrc?: string;
   fifthVideoSrc?: string;
+  sixthVideoSrc?: string;
 }
 
 const VideoCanvas: React.FC<VideoCanvasProps> = ({
@@ -19,13 +20,15 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   nextVideoSrc,
   thirdVideoSrc,
   fourthVideoSrc,
-  fifthVideoSrc
+  fifthVideoSrc,
+  sixthVideoSrc
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const nextVideoRef = useRef<HTMLVideoElement>(null);
   const thirdVideoRef = useRef<HTMLVideoElement>(null);
   const fourthVideoRef = useRef<HTMLVideoElement>(null);
   const fifthVideoRef = useRef<HTMLVideoElement>(null);
+  const sixthVideoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(autoPlay);
   const [currentSrc, setCurrentSrc] = useState(src);
@@ -92,6 +95,13 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
           videoRef.current.play();
         }
       }
+      else if (currentVideoIndex === 5 && sixthVideoSrc) {
+        setCurrentSrc(sixthVideoSrc);
+        setCurrentVideoIndex(6);
+        if (videoRef.current) {
+          videoRef.current.play();
+        }
+      }
     };
 
     const video = videoRef.current;
@@ -103,7 +113,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
         video.removeEventListener('ended', handleEnded);
       }
     };
-  }, [currentVideoIndex, nextVideoSrc, thirdVideoSrc, fourthVideoSrc, fifthVideoSrc, dayAssets.sound]);
+  }, [currentVideoIndex, nextVideoSrc, thirdVideoSrc, fourthVideoSrc, fifthVideoSrc, sixthVideoSrc, dayAssets.sound]);
 
   const handlePlayPause = () => {
     if (videoRef.current) {
@@ -142,6 +152,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
         {thirdVideoSrc && <video ref={thirdVideoRef} src={thirdVideoSrc} className="hidden" preload="auto" />}
         {fourthVideoSrc && <video ref={fourthVideoRef} src={fourthVideoSrc} className="hidden" preload="auto" />}
         {fifthVideoSrc && <video ref={fifthVideoRef} src={fifthVideoSrc} className="hidden" preload="auto" />}
+        {sixthVideoSrc && <video ref={sixthVideoRef} src={sixthVideoSrc} className="hidden" preload="auto" />}
         
         {showOverlay && (
           <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
