@@ -1,7 +1,11 @@
+
 import React, { useRef, useState, useEffect } from 'react';
 import VideoControls from './VideoControls';
+import VideoOverlay from './video/VideoOverlay';
+import PreloadedVideos from './video/PreloadedVideos';
+import GameFrame from './video/GameFrame';
+import useVideoProgress from '../hooks/useVideoProgress';
 import { getCurrentDayAssets } from '../utils/dayAssets';
-import { supabase } from "@/integrations/supabase/client";
 
 interface VideoCanvasProps {
   src: string;
@@ -33,37 +37,16 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   const fifthVideoRef = useRef<HTMLVideoElement>(null);
   const sixthVideoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
+  
   const [isPlaying, setIsPlaying] = useState(autoPlay);
   const [currentSrc, setCurrentSrc] = useState(src);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(1);
   const [showOverlay, setShowOverlay] = useState(false);
   const [showIframe, setShowIframe] = useState(false);
-  const dayAssets = getCurrentDayAssets();
-
   const [sessionId] = useState(() => crypto.randomUUID());
-
-  const recordProgress = async (videoSrc: string, completed: boolean = false) => {
-    if (!studentId) return;
-
-    try {
-      const videoName = videoSrc.split('/').pop()?.split('?')[0] || 'unknown';
-      
-      const { error } = await supabase
-        .from('student_progress')
-        .insert({
-          session_id: sessionId,
-          student_id: studentId,
-          activity: videoName,
-          completed_at: completed ? new Date().toISOString() : null
-        });
-
-      if (error) {
-        console.error('Error recording progress:', error);
-      }
-    } catch (error) {
-      console.error('Error recording progress:', error);
-    }
-  };
+  
+  const dayAssets = getCurrentDayAssets();
+  const { recordProgress } = useVideoProgress(studentId, sessionId);
 
   useEffect(() => {
     if (audioRef.current) {
@@ -86,7 +69,6 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
         
         if (audioRef.current) {
           try {
-            console.log("Attempting to play audio:", dayAssets.sound);
             audioRef.current.currentTime = 0;
             audioRef.current.volume = 1.0;
             await audioRef.current.play();
@@ -151,13 +133,13 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
         video.removeEventListener('ended', handleEnded);
       }
     };
-  }, [currentVideoIndex, nextVideoSrc, thirdVideoSrc, fourthVideoSrc, fifthVideoSrc, sixthVideoSrc, dayAssets.sound, src]);
+  }, [currentVideoIndex, nextVideoSrc, thirdVideoSrc, fourthVideoSrc, fifthVideoSrc, sixthVideoSrc, dayAssets.sound, src, recordProgress]);
 
   useEffect(() => {
     if (studentId) {
       recordProgress(src);
     }
-  }, [studentId, src]);
+  }, [studentId, src, recordProgress]);
 
   const handlePlayPause = () => {
     if (videoRef.current) {
@@ -194,21 +176,12 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
               className="absolute inset-0 w-full h-full object-contain" 
             />
             
-            {nextVideoSrc && <video ref={nextVideoRef} src={nextVideoSrc} className="hidden" preload="auto" />}
-            {thirdVideoSrc && <video ref={thirdVideoRef} src={thirdVideoSrc} className="hidden" preload="auto" />}
-            {fourthVideoSrc && <video ref={fourthVideoRef} src={fourthVideoSrc} className="hidden" preload="auto" />}
-            {fifthVideoSrc && <video ref={fifthVideoRef} src={fifthVideoSrc} className="hidden" preload="auto" />}
-            {sixthVideoSrc && <video ref={sixthVideoRef} src={sixthVideoSrc} className="hidden" preload="auto" />}
+            <PreloadedVideos
+              sources={[nextVideoSrc, thirdVideoSrc, fourthVideoSrc, fifthVideoSrc, sixthVideoSrc]}
+              refs={[nextVideoRef, thirdVideoRef, fourthVideoRef, fifthVideoRef, sixthVideoRef]}
+            />
             
-            {showOverlay && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                <img 
-                  src={dayAssets.image}
-                  alt="Day of the week" 
-                  className="max-w-full max-h-full object-contain animate-fade-in" 
-                />
-              </div>
-            )}
+            <VideoOverlay show={showOverlay} imageSrc={dayAssets.image} />
             
             <audio 
               ref={audioRef} 
@@ -216,17 +189,14 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
               preload="auto"
             />
             
-            <VideoControls isPlaying={isPlaying} onPlayPause={handlePlayPause} onFullscreen={handleFullscreen} />
+            <VideoControls 
+              isPlaying={isPlaying} 
+              onPlayPause={handlePlayPause} 
+              onFullscreen={handleFullscreen} 
+            />
           </>
         ) : (
-          <iframe
-            src={`https://preview--confetti-square-celebration.lovable.app/?sessionId=${sessionId}&studentId=${studentId}`}
-            frameBorder="0"
-            width="100%"
-            height="100%"
-            className="absolute inset-0"
-            allow="autoplay; fullscreen; vr"
-          />
+          <GameFrame sessionId={sessionId} studentId={studentId} />
         )}
       </div>
     </div>
