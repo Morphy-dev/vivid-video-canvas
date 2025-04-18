@@ -1,7 +1,57 @@
 
+import React, { useState } from 'react';
+import { supabase } from "@/integrations/supabase/client";
 import VideoCanvas from '../components/VideoCanvas';
+import CodeEntry from '../components/CodeEntry';
+import StudentSelector from '../components/StudentSelector';
+
+interface Student {
+  id: string;
+  nombre_completo: string;
+  foto_url: string;
+}
 
 const Index = () => {
+  const [groupId, setGroupId] = useState<string | null>(null);
+  const [students, setStudents] = useState<Student[]>([]);
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+
+  const handleGroupFound = async (foundGroupId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('estudiantes')
+        .select('id, nombre_completo, foto_url')
+        .eq('grupo_id', foundGroupId)
+        .eq('status', true);
+
+      if (error) throw error;
+      setStudents(data || []);
+      setGroupId(foundGroupId);
+    } catch (error) {
+      console.error('Error fetching students:', error);
+    }
+  };
+
+  const handleStudentSelect = (student: Student) => {
+    setSelectedStudent(student);
+  };
+
+  if (!groupId) {
+    return (
+      <div className="min-h-screen bg-soft-gray flex items-center justify-center p-8">
+        <CodeEntry onGroupFound={handleGroupFound} />
+      </div>
+    );
+  }
+
+  if (!selectedStudent) {
+    return (
+      <div className="min-h-screen bg-soft-gray flex items-center justify-center p-8">
+        <StudentSelector students={students} onStudentSelect={handleStudentSelect} />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-soft-gray flex items-center justify-center p-8">
       <div className="w-full max-w-[90vw]">
