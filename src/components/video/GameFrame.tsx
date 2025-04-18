@@ -9,7 +9,7 @@ interface GameFrameProps {
 const GameFrame: React.FC<GameFrameProps> = ({ sessionId, studentId }) => {
   return (
     <iframe
-      src={`https://preview--confetti-square-celebration.lovable.app/?sessionId=${sessionId}&studentId=${studentId}`}
+      src={`https://preview--confetti-square-celebration.lovable.app/?student_session=${sessionId}&student_id=${studentId || ''}`}
       frameBorder="0"
       width="100%"
       height="100%"
