@@ -1,3 +1,4 @@
+
 import React, { useRef, useState, useEffect } from 'react';
 import VideoControls from './VideoControls';
 import { getCurrentDayAssets } from '../utils/dayAssets';
@@ -180,7 +181,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
           </>
         ) : (
           <iframe
-            src="https://spline.design/wy6TJP3YMza7a4Qq/scene"
+            src="https://preview--confetti-square-celebration.lovable.app/"
             frameBorder="0"
             width="100%"
             height="100%"
