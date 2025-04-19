@@ -56,6 +56,28 @@ export const useVideoSequence = ({
   
   const { recordProgress } = useVideoProgress(studentId, sessionId);
 
+  useEffect(() => {
+    const handleGameMessage = (event: MessageEvent) => {
+      console.log('Received message from iframe:', event.data);
+      
+      if (event.data?.type === "game_finished") {
+        console.log("✅ Game is finished!");
+        if (showIframe) {
+          setShowIframe(false);
+          setShowSecondIframe(true);
+        } else if (showSecondIframe) {
+          setShowSecondIframe(false);
+          if (seventhVideoSrc) {
+            playNextVideo(seventhVideoSrc, 7);
+          }
+        }
+      }
+    };
+
+    window.addEventListener('message', handleGameMessage);
+    return () => window.removeEventListener('message', handleGameMessage);
+  }, [showIframe, showSecondIframe, seventhVideoSrc]);
+
   const playNextVideo = async (nextSrc: string, nextIndex: number) => {
     setCurrentSrc(nextSrc);
     setCurrentVideoIndex(nextIndex);
@@ -105,10 +127,10 @@ export const useVideoSequence = ({
         if (sixthVideoSrc) await playNextVideo(sixthVideoSrc, 6);
         break;
       case 6:
-        if (seventhVideoSrc) await playNextVideo(seventhVideoSrc, 7);
+        setShowIframe(true);
         break;
       case 7:
-        setShowSecondIframe(true);
+        if (eighthVideoSrc) await playNextVideo(eighthVideoSrc, 8);
         break;
       case 8:
         if (ninthVideoSrc) await playNextVideo(ninthVideoSrc, 9);
