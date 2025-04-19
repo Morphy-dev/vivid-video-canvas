@@ -1,8 +1,10 @@
 
-import { useEffect, RefObject } from 'react';
+import { useEffect } from 'react';
 import { useVideoTransition } from './video/useVideoTransition';
 import { useVideoOverlay } from './video/useVideoOverlay';
 import { useIframeState } from './video/useIframeState';
+import { useVideoSequenceLogic } from './video/useVideoSequenceLogic';
+import { useJumpToVideo } from './video/useJumpToVideo';
 
 interface UseVideoSequenceProps {
   initialSrc: string;
@@ -24,43 +26,26 @@ interface UseVideoSequenceProps {
   audioRef: RefObject<HTMLAudioElement>;
 }
 
-interface VideoSequenceState {
-  currentSrc: string;
-  currentVideoIndex: number;
-  showOverlay: boolean;
-  showIframe: boolean;
-  showSecondIframe: boolean;
-  jumpToVideo: (index: number) => void;
-}
-
 export const useVideoSequence = ({
   initialSrc,
-  nextVideoSrc,
-  thirdVideoSrc,
-  fourthVideoSrc,
-  fifthVideoSrc,
-  sixthVideoSrc,
-  seventhVideoSrc,
-  eighthVideoSrc,
-  ninthVideoSrc,
-  tenthVideoSrc,
-  eleventhVideoSrc,
-  twelfthVideoSrc,
-  thirteenthVideoSrc,
-  studentId,
-  sessionId,
-  videoRef,
-  audioRef
-}: UseVideoSequenceProps): VideoSequenceState => {
+  ...props
+}: UseVideoSequenceProps) => {
   const { 
     currentSrc, 
     currentVideoIndex, 
     setCurrentVideoIndex,
     playNextVideo, 
     recordProgress 
-  } = useVideoTransition({ initialSrc, studentId, sessionId, videoRef });
+  } = useVideoTransition({ 
+    initialSrc, 
+    studentId: props.studentId, 
+    sessionId: props.sessionId, 
+    videoRef: props.videoRef 
+  });
   
-  const { showOverlay, handleOverlayTransition } = useVideoOverlay({ audioRef });
+  const { showOverlay, handleOverlayTransition } = useVideoOverlay({ 
+    audioRef: props.audioRef 
+  });
   
   const { 
     showIframe, 
@@ -70,70 +55,35 @@ export const useVideoSequence = ({
     handleGameMessage 
   } = useIframeState();
 
+  const { handleVideoSequence } = useVideoSequenceLogic({
+    playNextVideo,
+    setShowIframe,
+    handleOverlayTransition
+  });
+
+  const { jumpToVideo } = useJumpToVideo({
+    setShowIframe,
+    setShowSecondIframe,
+    setCurrentVideoIndex,
+    recordProgress,
+    videoRef: props.videoRef
+  });
+
   useEffect(() => {
     const messageHandler = (event: MessageEvent) => {
-      handleGameMessage(event, seventhVideoSrc, playNextVideo);
+      handleGameMessage(event, props.seventhVideoSrc, playNextVideo);
     };
 
     window.addEventListener('message', messageHandler);
     return () => window.removeEventListener('message', messageHandler);
-  }, [showIframe, showSecondIframe, seventhVideoSrc]);
-
-  const handleVideoSequence = async (currentSrc: string, index: number) => {
-    await recordProgress(currentSrc, true);
-    
-    switch (index) {
-      case 1:
-        if (nextVideoSrc) {
-          await handleOverlayTransition();
-          await playNextVideo(nextVideoSrc, 2);
-        }
-        break;
-      case 2:
-        if (thirdVideoSrc) await playNextVideo(thirdVideoSrc, 3);
-        break;
-      case 3:
-        if (fourthVideoSrc) await playNextVideo(fourthVideoSrc, 4);
-        break;
-      case 4:
-        if (fifthVideoSrc) await playNextVideo(fifthVideoSrc, 5);
-        break;
-      case 5:
-        if (sixthVideoSrc) await playNextVideo(sixthVideoSrc, 6);
-        break;
-      case 6:
-        setShowIframe(true);
-        break;
-      case 7:
-        if (eighthVideoSrc) await playNextVideo(eighthVideoSrc, 8);
-        break;
-      case 8:
-        if (ninthVideoSrc) await playNextVideo(ninthVideoSrc, 9);
-        break;
-      case 9:
-        if (tenthVideoSrc) await playNextVideo(tenthVideoSrc, 10);
-        break;
-      case 10:
-        if (eleventhVideoSrc) await playNextVideo(eleventhVideoSrc, 11);
-        break;
-      case 11:
-        if (twelfthVideoSrc) await playNextVideo(twelfthVideoSrc, 12);
-        break;
-      case 12:
-        if (thirteenthVideoSrc) await playNextVideo(thirteenthVideoSrc, 13);
-        break;
-      case 13:
-        await recordProgress(thirteenthVideoSrc!, true);
-        break;
-    }
-  };
+  }, [showIframe, showSecondIframe, props.seventhVideoSrc]);
 
   useEffect(() => {
     const handleEnded = () => {
-      handleVideoSequence(currentSrc, currentVideoIndex);
+      handleVideoSequence(currentSrc, currentVideoIndex, props);
     };
 
-    const video = videoRef.current;
+    const video = props.videoRef.current;
     if (video) {
       video.addEventListener('ended', handleEnded);
     }
@@ -143,47 +93,18 @@ export const useVideoSequence = ({
         video.removeEventListener('ended', handleEnded);
       }
     };
-  }, [currentVideoIndex, nextVideoSrc, thirdVideoSrc, fourthVideoSrc, fifthVideoSrc, sixthVideoSrc, currentSrc]);
+  }, [currentVideoIndex, currentSrc, props]);
 
   useEffect(() => {
-    if (studentId) {
+    if (props.studentId) {
       recordProgress(initialSrc);
     }
-  }, [studentId, initialSrc]);
+  }, [props.studentId, initialSrc]);
 
-  const jumpToVideo = async (index: number) => {
-    setShowIframe(false);
-    setShowSecondIframe(false);
-    
-    let newSrc: string | undefined;
-    
-    switch (index) {
-      case 1: newSrc = initialSrc; break;
-      case 2: newSrc = nextVideoSrc; break;
-      case 3: newSrc = thirdVideoSrc; break;
-      case 4: newSrc = fourthVideoSrc; break;
-      case 5: newSrc = fifthVideoSrc; break;
-      case 6: newSrc = sixthVideoSrc; break;
-      case 7: newSrc = seventhVideoSrc; break;
-      case 8: newSrc = eighthVideoSrc; break;
-      case 9: newSrc = ninthVideoSrc; break;
-      case 10: newSrc = tenthVideoSrc; break;
-      case 11: newSrc = eleventhVideoSrc; break;
-      case 12: newSrc = twelfthVideoSrc; break;
-      case 13: newSrc = thirteenthVideoSrc; break;
-    }
-    
-    if (newSrc) {
-      setCurrentVideoIndex(index);
-      await recordProgress(newSrc);
-      
-      if (index === 6) {
-        setShowIframe(true);
-      } else if (videoRef.current) {
-        videoRef.current.play();
-      }
-    }
-  };
+  const jumpToVideoWrapper = (index: number) => jumpToVideo(index, {
+    initialSrc,
+    ...props
+  });
 
   return {
     currentSrc,
@@ -191,6 +112,6 @@ export const useVideoSequence = ({
     showOverlay,
     showIframe,
     showSecondIframe,
-    jumpToVideo
+    jumpToVideo: jumpToVideoWrapper
   };
 };
