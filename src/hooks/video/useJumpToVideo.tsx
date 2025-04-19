@@ -1,6 +1,6 @@
 
 import { useCallback } from 'react';
-import { RefObject } from 'react'; // Add the missing import
+import { RefObject } from 'react';
 
 interface UseJumpToVideoProps {
   setShowIframe: (show: boolean) => void;
@@ -8,6 +8,22 @@ interface UseJumpToVideoProps {
   setCurrentVideoIndex: (index: number) => void;
   recordProgress: (src: string) => Promise<void>;
   videoRef: RefObject<HTMLVideoElement>;
+}
+
+interface VideoSources {
+  initialSrc?: string;
+  nextVideoSrc?: string;
+  thirdVideoSrc?: string;
+  fourthVideoSrc?: string;
+  fifthVideoSrc?: string;
+  sixthVideoSrc?: string;
+  seventhVideoSrc?: string;
+  eighthVideoSrc?: string;
+  ninthVideoSrc?: string;
+  tenthVideoSrc?: string;
+  eleventhVideoSrc?: string;
+  twelfthVideoSrc?: string;
+  thirteenthVideoSrc?: string;
 }
 
 export const useJumpToVideo = ({
@@ -19,7 +35,7 @@ export const useJumpToVideo = ({
 }: UseJumpToVideoProps) => {
   const jumpToVideo = useCallback(async (
     index: number,
-    videos: { [key: string]: string | undefined }
+    videos: VideoSources
   ) => {
     setShowIframe(false);
     setShowSecondIframe(false);

@@ -29,7 +29,22 @@ interface UseVideoSequenceProps {
 
 export const useVideoSequence = ({
   initialSrc,
-  ...props
+  nextVideoSrc,
+  thirdVideoSrc,
+  fourthVideoSrc,
+  fifthVideoSrc,
+  sixthVideoSrc,
+  seventhVideoSrc,
+  eighthVideoSrc,
+  ninthVideoSrc,
+  tenthVideoSrc,
+  eleventhVideoSrc,
+  twelfthVideoSrc,
+  thirteenthVideoSrc,
+  studentId,
+  sessionId,
+  videoRef,
+  audioRef
 }: UseVideoSequenceProps) => {
   const { 
     currentSrc, 
@@ -39,13 +54,13 @@ export const useVideoSequence = ({
     recordProgress 
   } = useVideoTransition({ 
     initialSrc, 
-    studentId: props.studentId, 
-    sessionId: props.sessionId, 
-    videoRef: props.videoRef 
+    studentId, 
+    sessionId, 
+    videoRef 
   });
   
   const { showOverlay, handleOverlayTransition } = useVideoOverlay({ 
-    audioRef: props.audioRef 
+    audioRef 
   });
   
   const { 
@@ -56,11 +71,27 @@ export const useVideoSequence = ({
     handleGameMessage 
   } = useIframeState();
 
+  // Extract only video sources for passing to handleVideoSequence
+  const videoSources = {
+    nextVideoSrc,
+    thirdVideoSrc,
+    fourthVideoSrc,
+    fifthVideoSrc,
+    sixthVideoSrc,
+    seventhVideoSrc,
+    eighthVideoSrc,
+    ninthVideoSrc,
+    tenthVideoSrc,
+    eleventhVideoSrc,
+    twelfthVideoSrc,
+    thirteenthVideoSrc
+  };
+
   const { handleVideoSequence } = useVideoSequenceLogic({
     playNextVideo,
     setShowIframe,
     handleOverlayTransition,
-    recordProgress // Pass recordProgress to useVideoSequenceLogic
+    recordProgress
   });
 
   const { jumpToVideo } = useJumpToVideo({
@@ -68,24 +99,24 @@ export const useVideoSequence = ({
     setShowSecondIframe,
     setCurrentVideoIndex,
     recordProgress,
-    videoRef: props.videoRef
+    videoRef
   });
 
   useEffect(() => {
     const messageHandler = (event: MessageEvent) => {
-      handleGameMessage(event, props.seventhVideoSrc, playNextVideo);
+      handleGameMessage(event, seventhVideoSrc, playNextVideo);
     };
 
     window.addEventListener('message', messageHandler);
     return () => window.removeEventListener('message', messageHandler);
-  }, [showIframe, showSecondIframe, props.seventhVideoSrc]);
+  }, [showIframe, showSecondIframe, seventhVideoSrc]);
 
   useEffect(() => {
     const handleEnded = () => {
-      handleVideoSequence(currentSrc, currentVideoIndex, props);
+      handleVideoSequence(currentSrc, currentVideoIndex, videoSources);
     };
 
-    const video = props.videoRef.current;
+    const video = videoRef.current;
     if (video) {
       video.addEventListener('ended', handleEnded);
     }
@@ -95,17 +126,17 @@ export const useVideoSequence = ({
         video.removeEventListener('ended', handleEnded);
       }
     };
-  }, [currentVideoIndex, currentSrc, props]);
+  }, [currentVideoIndex, currentSrc, videoSources, handleVideoSequence, videoRef]);
 
   useEffect(() => {
-    if (props.studentId) {
+    if (studentId) {
       recordProgress(initialSrc);
     }
-  }, [props.studentId, initialSrc]);
+  }, [studentId, initialSrc, recordProgress]);
 
   const jumpToVideoWrapper = (index: number) => jumpToVideo(index, {
     initialSrc,
-    ...props
+    ...videoSources
   });
 
   return {
