@@ -30,8 +30,16 @@ const GameFrame: React.FC<GameFrameProps> = ({ sessionId, studentId }) => {
 
     // Handle messages from the game
     const handleGameMessage = (event: MessageEvent) => {
+      console.log('Message received:', event); // Log all received messages
+      console.log('Origin:', event.origin); // Log the origin of the message
+      console.log('Message data:', event.data); // Log the message data
+
       if (event.origin === 'https://preview--confetti-square-celebration.lovable.app') {
+        console.log('Message from expected origin'); // Confirm origin match
+
         if (event.data.type === 'GAME_COMPLETE') {
+          console.log('Game complete message received'); // Confirm game complete message
+          
           // Add a 7-second delay before closing the iframe
           setTimeout(() => {
             setIsOpen(false);
