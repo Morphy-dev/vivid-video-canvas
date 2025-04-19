@@ -13,6 +13,17 @@ const GameFrame: React.FC<GameFrameProps> = ({ sessionId, studentId }) => {
   const gameUrl = 'https://preview--confetti-square-celebration.lovable.app';
 
   useEffect(() => {
+    // Handle messages from the game
+    const handleGameMessage = (event: MessageEvent) => {
+      if (event.data?.type === "game_finished") {
+        console.log("✅ Game is finished!");
+        setIsOpen(false);
+      }
+    };
+
+    // Add event listener for game messages
+    window.addEventListener('message', handleGameMessage);
+
     // Wait for iframe to load before sending the message
     const handleIframeLoad = () => {
       if (iframeRef.current?.contentWindow) {
@@ -24,7 +35,7 @@ const GameFrame: React.FC<GameFrameProps> = ({ sessionId, studentId }) => {
               student_session: sessionId,
             }
           },
-          '*' // Using '*' to allow any origin to receive the message
+          '*'
         );
         console.log('Init game message sent to iframe');
       }
@@ -39,6 +50,7 @@ const GameFrame: React.FC<GameFrameProps> = ({ sessionId, studentId }) => {
       if (iframe) {
         iframe.removeEventListener('load', handleIframeLoad);
       }
+      window.removeEventListener('message', handleGameMessage);
     };
   }, [sessionId, studentId]);
 
