@@ -1,3 +1,4 @@
+
 import { useState, useEffect, RefObject } from 'react';
 import useVideoProgress from './useVideoProgress';
 
@@ -27,6 +28,7 @@ interface VideoSequenceState {
   showOverlay: boolean;
   showIframe: boolean;
   showSecondIframe: boolean;
+  jumpToVideo: (index: number) => void;
 }
 
 export const useVideoSequence = ({
@@ -176,11 +178,52 @@ export const useVideoSequence = ({
     }
   }, [studentId, initialSrc, recordProgress]);
 
+  const jumpToVideo = async (index: number) => {
+    // Close any open iframes first
+    setShowIframe(false);
+    setShowSecondIframe(false);
+    
+    // Determine which video source to use based on index
+    let newSrc: string | undefined;
+    
+    switch (index) {
+      case 1: newSrc = initialSrc; break;
+      case 2: newSrc = nextVideoSrc; break;
+      case 3: newSrc = thirdVideoSrc; break;
+      case 4: newSrc = fourthVideoSrc; break;
+      case 5: newSrc = fifthVideoSrc; break;
+      case 6: newSrc = sixthVideoSrc; break;
+      case 7: newSrc = seventhVideoSrc; break;
+      case 8: newSrc = eighthVideoSrc; break;
+      case 9: newSrc = ninthVideoSrc; break;
+      case 10: newSrc = tenthVideoSrc; break;
+      case 11: newSrc = eleventhVideoSrc; break;
+      case 12: newSrc = twelfthVideoSrc; break;
+      case 13: newSrc = thirteenthVideoSrc; break;
+    }
+    
+    if (newSrc) {
+      setCurrentSrc(newSrc);
+      setCurrentVideoIndex(index);
+      await recordProgress(newSrc);
+      
+      // Special case for video 6 that should show iframe
+      if (index === 6) {
+        setShowIframe(true);
+      }
+      // If we're on video 6 (after iframe 1, before iframe 2)
+      else if (videoRef.current) {
+        videoRef.current.play();
+      }
+    }
+  };
+
   return {
     currentSrc,
     currentVideoIndex,
     showOverlay,
     showIframe,
-    showSecondIframe
+    showSecondIframe,
+    jumpToVideo
   };
 };

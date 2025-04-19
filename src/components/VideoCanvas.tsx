@@ -6,6 +6,7 @@ import PreloadedVideos from './video/PreloadedVideos';
 import GameFrame from './video/GameFrame';
 import { useVideoSequence } from '../hooks/useVideoSequence';
 import { getCurrentDayAssets } from '../utils/dayAssets';
+import VideoIndex from './video/VideoIndex';
 
 interface VideoCanvasProps {
   src: string;
@@ -61,10 +62,18 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   
   const [isPlaying, setIsPlaying] = useState(autoPlay);
   const [sessionId] = useState(() => crypto.randomUUID());
+  const [showIndex, setShowIndex] = useState(true);
   
   const dayAssets = getCurrentDayAssets();
 
-  const { currentSrc, showOverlay, showIframe, showSecondIframe } = useVideoSequence({
+  const { 
+    currentSrc, 
+    showOverlay, 
+    showIframe, 
+    showSecondIframe,
+    currentVideoIndex,
+    jumpToVideo
+  } = useVideoSequence({
     initialSrc: src,
     nextVideoSrc,
     thirdVideoSrc,
@@ -105,10 +114,42 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
     }
   };
 
+  const handleIndexSelect = (index: number) => {
+    jumpToVideo(index);
+    setShowIndex(false);
+  };
+
+  // Define available videos for the index
+  const availableVideos = [
+    { index: 1, label: "Video 1", src },
+    { index: 2, label: "Video 2", src: nextVideoSrc },
+    { index: 3, label: "Video 3", src: thirdVideoSrc },
+    { index: 4, label: "Video 4", src: fourthVideoSrc },
+    { index: 5, label: "Video 5", src: fifthVideoSrc },
+    { index: 6, label: "Video 6", src: sixthVideoSrc },
+    { index: 7, label: "Video 7", src: seventhVideoSrc },
+    { index: 8, label: "Video 8", src: eighthVideoSrc },
+    { index: 9, label: "Video 9", src: ninthVideoSrc },
+    { index: 10, label: "Video 10", src: tenthVideoSrc },
+    { index: 11, label: "Video 11", src: eleventhVideoSrc },
+    { index: 12, label: "Video 12", src: twelfthVideoSrc },
+    { index: 13, label: "Video 13", src: thirteenthVideoSrc },
+  ].filter(video => video.src);
+
+  if (showIndex) {
+    return (
+      <VideoIndex 
+        videos={availableVideos}
+        onSelect={handleIndexSelect}
+        onFirstVideo={() => setShowIndex(false)}
+      />
+    );
+  }
+
   return (
     <div className={`relative w-full max-w-6xl mx-auto ${className}`}>
       <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
-        {!showIframe && !showSecondIframe ? (
+        {!showIframe && !showSecondIframe && (
           <>
             <video 
               ref={videoRef} 
@@ -162,15 +203,20 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
               isPlaying={isPlaying} 
               onPlayPause={handlePlayPause} 
               onFullscreen={handleFullscreen} 
+              onShowIndex={() => setShowIndex(true)}
             />
           </>
-        ) : showIframe ? (
+        )}
+        
+        {showIframe && (
           <GameFrame 
             sessionId={sessionId} 
             studentId={studentId} 
             gameUrl="https://preview--confetti-square-celebration.lovable.app"
           />
-        ) : (
+        )}
+        
+        {showSecondIframe && (
           <GameFrame 
             sessionId={sessionId} 
             studentId={studentId} 
