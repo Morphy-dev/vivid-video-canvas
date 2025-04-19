@@ -1,6 +1,8 @@
 
-import { useState, useEffect, RefObject } from 'react';
-import useVideoProgress from './useVideoProgress';
+import { useEffect, RefObject } from 'react';
+import { useVideoTransition } from './video/useVideoTransition';
+import { useVideoOverlay } from './video/useVideoOverlay';
+import { useIframeState } from './video/useIframeState';
 
 interface UseVideoSequenceProps {
   initialSrc: string;
@@ -50,61 +52,32 @@ export const useVideoSequence = ({
   videoRef,
   audioRef
 }: UseVideoSequenceProps): VideoSequenceState => {
-  const [currentSrc, setCurrentSrc] = useState(initialSrc);
-  const [currentVideoIndex, setCurrentVideoIndex] = useState(1);
-  const [showOverlay, setShowOverlay] = useState(false);
-  const [showIframe, setShowIframe] = useState(false);
-  const [showSecondIframe, setShowSecondIframe] = useState(false);
+  const { 
+    currentSrc, 
+    currentVideoIndex, 
+    setCurrentVideoIndex,
+    playNextVideo, 
+    recordProgress 
+  } = useVideoTransition({ initialSrc, studentId, sessionId, videoRef });
   
-  const { recordProgress } = useVideoProgress(studentId, sessionId);
+  const { showOverlay, handleOverlayTransition } = useVideoOverlay({ audioRef });
+  
+  const { 
+    showIframe, 
+    setShowIframe, 
+    showSecondIframe, 
+    setShowSecondIframe,
+    handleGameMessage 
+  } = useIframeState();
 
   useEffect(() => {
-    const handleGameMessage = (event: MessageEvent) => {
-      console.log('Received message from iframe:', event.data);
-      
-      if (event.data?.type === "game_finished") {
-        console.log("✅ Game is finished!");
-        if (showIframe) {
-          setShowIframe(false);
-          setShowSecondIframe(true);
-        } else if (showSecondIframe) {
-          setShowSecondIframe(false);
-          if (seventhVideoSrc) {
-            playNextVideo(seventhVideoSrc, 7);
-          }
-        }
-      }
+    const messageHandler = (event: MessageEvent) => {
+      handleGameMessage(event, seventhVideoSrc, playNextVideo);
     };
 
-    window.addEventListener('message', handleGameMessage);
-    return () => window.removeEventListener('message', handleGameMessage);
+    window.addEventListener('message', messageHandler);
+    return () => window.removeEventListener('message', messageHandler);
   }, [showIframe, showSecondIframe, seventhVideoSrc]);
-
-  const playNextVideo = async (nextSrc: string, nextIndex: number) => {
-    setCurrentSrc(nextSrc);
-    setCurrentVideoIndex(nextIndex);
-    await recordProgress(nextSrc);
-    if (videoRef.current) {
-      videoRef.current.play();
-    }
-  };
-
-  const handleOverlayTransition = async () => {
-    setShowOverlay(true);
-    
-    if (audioRef.current) {
-      try {
-        audioRef.current.currentTime = 0;
-        audioRef.current.volume = 1.0;
-        await audioRef.current.play();
-      } catch (error) {
-        console.error("Audio playback error:", error);
-      }
-    }
-    
-    await new Promise(resolve => setTimeout(resolve, 4000));
-    setShowOverlay(false);
-  };
 
   const handleVideoSequence = async (currentSrc: string, index: number) => {
     await recordProgress(currentSrc, true);
@@ -176,14 +149,12 @@ export const useVideoSequence = ({
     if (studentId) {
       recordProgress(initialSrc);
     }
-  }, [studentId, initialSrc, recordProgress]);
+  }, [studentId, initialSrc]);
 
   const jumpToVideo = async (index: number) => {
-    // Close any open iframes first
     setShowIframe(false);
     setShowSecondIframe(false);
     
-    // Determine which video source to use based on index
     let newSrc: string | undefined;
     
     switch (index) {
@@ -203,16 +174,12 @@ export const useVideoSequence = ({
     }
     
     if (newSrc) {
-      setCurrentSrc(newSrc);
       setCurrentVideoIndex(index);
       await recordProgress(newSrc);
       
-      // Special case for video 6 that should show iframe
       if (index === 6) {
         setShowIframe(true);
-      }
-      // If we're on video 6 (after iframe 1, before iframe 2)
-      else if (videoRef.current) {
+      } else if (videoRef.current) {
         videoRef.current.play();
       }
     }
