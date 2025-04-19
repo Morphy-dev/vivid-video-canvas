@@ -1,17 +1,20 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 
 interface GameFrameProps {
   sessionId: string;
   studentId?: string;
+  gameUrl?: string;
 }
 
-const GameFrame: React.FC<GameFrameProps> = ({ sessionId, studentId }) => {
+const GameFrame: React.FC<GameFrameProps> = ({ 
+  sessionId, 
+  studentId,
+  gameUrl = 'https://preview--confetti-square-celebration.lovable.app'
+}) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [isOpen, setIsOpen] = useState(true);
   const [iframeLoaded, setIframeLoaded] = useState(false);
-  const gameUrl = 'https://preview--confetti-square-celebration.lovable.app';
 
   // Function to send IDs to the game iframe
   const sendIdsToGame = () => {

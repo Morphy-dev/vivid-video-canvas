@@ -1,4 +1,3 @@
-
 import { useState, useEffect, RefObject } from 'react';
 import useVideoProgress from './useVideoProgress';
 
@@ -27,6 +26,7 @@ interface VideoSequenceState {
   currentVideoIndex: number;
   showOverlay: boolean;
   showIframe: boolean;
+  showSecondIframe: boolean;
 }
 
 export const useVideoSequence = ({
@@ -52,6 +52,7 @@ export const useVideoSequence = ({
   const [currentVideoIndex, setCurrentVideoIndex] = useState(1);
   const [showOverlay, setShowOverlay] = useState(false);
   const [showIframe, setShowIframe] = useState(false);
+  const [showSecondIframe, setShowSecondIframe] = useState(false);
   
   const { recordProgress } = useVideoProgress(studentId, sessionId);
 
@@ -107,7 +108,7 @@ export const useVideoSequence = ({
         if (seventhVideoSrc) await playNextVideo(seventhVideoSrc, 7);
         break;
       case 7:
-        if (eighthVideoSrc) await playNextVideo(eighthVideoSrc, 8);
+        setShowSecondIframe(true);
         break;
       case 8:
         if (ninthVideoSrc) await playNextVideo(ninthVideoSrc, 9);
@@ -126,7 +127,6 @@ export const useVideoSequence = ({
         break;
       case 13:
         await recordProgress(thirteenthVideoSrc!, true);
-        setShowIframe(true);
         break;
     }
   };
@@ -158,6 +158,7 @@ export const useVideoSequence = ({
     currentSrc,
     currentVideoIndex,
     showOverlay,
-    showIframe
+    showIframe,
+    showSecondIframe
   };
 };

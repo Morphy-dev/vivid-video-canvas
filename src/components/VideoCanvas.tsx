@@ -1,4 +1,3 @@
-
 import React, { useRef, useState } from 'react';
 import VideoControls from './VideoControls';
 import VideoOverlay from './video/VideoOverlay';
@@ -64,7 +63,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   
   const dayAssets = getCurrentDayAssets();
 
-  const { currentSrc, showOverlay, showIframe } = useVideoSequence({
+  const { currentSrc, showOverlay, showIframe, showSecondIframe } = useVideoSequence({
     initialSrc: src,
     nextVideoSrc,
     thirdVideoSrc,
@@ -108,7 +107,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   return (
     <div className={`relative w-full max-w-6xl mx-auto ${className}`}>
       <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
-        {!showIframe ? (
+        {!showIframe && !showSecondIframe ? (
           <>
             <video 
               ref={videoRef} 
@@ -164,8 +163,17 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
               onFullscreen={handleFullscreen} 
             />
           </>
+        ) : showIframe ? (
+          <GameFrame 
+            sessionId={sessionId} 
+            studentId={studentId} 
+          />
         ) : (
-          <GameFrame sessionId={sessionId} studentId={studentId} />
+          <GameFrame 
+            sessionId={sessionId} 
+            studentId={studentId} 
+            gameUrl="https://preview--item-picker-fall.lovable.app"
+          />
         )}
       </div>
     </div>
