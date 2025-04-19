@@ -1,5 +1,6 @@
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 interface GameFrameProps {
   sessionId: string;
@@ -8,6 +9,7 @@ interface GameFrameProps {
 
 const GameFrame: React.FC<GameFrameProps> = ({ sessionId, studentId }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [isOpen, setIsOpen] = useState(true);
 
   useEffect(() => {
     // Wait for iframe to load before sending the message
@@ -26,28 +28,43 @@ const GameFrame: React.FC<GameFrameProps> = ({ sessionId, studentId }) => {
       }
     };
 
+    // Handle messages from the game
+    const handleGameMessage = (event: MessageEvent) => {
+      if (event.origin === 'https://preview--confetti-square-celebration.lovable.app') {
+        if (event.data.type === 'GAME_COMPLETE') {
+          setIsOpen(false);
+        }
+      }
+    };
+
     const iframe = iframeRef.current;
     if (iframe) {
       iframe.addEventListener('load', handleIframeLoad);
+      window.addEventListener('message', handleGameMessage);
     }
 
     return () => {
       if (iframe) {
         iframe.removeEventListener('load', handleIframeLoad);
       }
+      window.removeEventListener('message', handleGameMessage);
     };
   }, [sessionId, studentId]);
 
   return (
-    <iframe
-      ref={iframeRef}
-      src="https://preview--confetti-square-celebration.lovable.app"
-      frameBorder="0"
-      width="100%"
-      height="100%"
-      className="absolute inset-0"
-      allow="autoplay; fullscreen; vr"
-    />
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogContent className="max-w-6xl p-0" onInteractOutside={(e) => e.preventDefault()}>
+        <iframe
+          ref={iframeRef}
+          src="https://preview--confetti-square-celebration.lovable.app"
+          frameBorder="0"
+          width="100%"
+          height="100%"
+          className="aspect-video"
+          allow="autoplay; fullscreen; vr"
+        />
+      </DialogContent>
+    </Dialog>
   );
 };
 
