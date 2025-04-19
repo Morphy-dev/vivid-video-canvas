@@ -1,3 +1,4 @@
+
 import React, { useRef, useState } from 'react';
 import VideoControls from './VideoControls';
 import VideoOverlay from './video/VideoOverlay';
@@ -167,6 +168,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
           <GameFrame 
             sessionId={sessionId} 
             studentId={studentId} 
+            gameUrl="https://preview--confetti-square-celebration.lovable.app"
           />
         ) : (
           <GameFrame 
