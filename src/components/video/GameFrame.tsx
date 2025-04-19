@@ -12,6 +12,23 @@ const GameFrame: React.FC<GameFrameProps> = ({ sessionId, studentId }) => {
   const [isOpen, setIsOpen] = useState(true);
   const gameUrl = 'https://preview--confetti-square-celebration.lovable.app';
 
+  // Function to send IDs to the game iframe
+  const sendIdsToGame = (iframe: HTMLIFrameElement) => {
+    if (iframe?.contentWindow) {
+      iframe.contentWindow.postMessage(
+        {
+          type: 'INIT_GAME',
+          data: {
+            student_id: studentId,
+            student_session: sessionId,
+          }
+        },
+        '*'
+      );
+      console.log('Init game message sent to iframe');
+    }
+  };
+
   useEffect(() => {
     // Handle messages from the game
     const handleGameMessage = (event: MessageEvent) => {
@@ -26,18 +43,8 @@ const GameFrame: React.FC<GameFrameProps> = ({ sessionId, studentId }) => {
 
     // Wait for iframe to load before sending the message
     const handleIframeLoad = () => {
-      if (iframeRef.current?.contentWindow) {
-        iframeRef.current.contentWindow.postMessage(
-          {
-            type: 'INIT_GAME',
-            data: {
-              student_id: studentId,
-              student_session: sessionId,
-            }
-          },
-          '*'
-        );
-        console.log('Init game message sent to iframe');
+      if (iframeRef.current) {
+        sendIdsToGame(iframeRef.current);
       }
     };
 
@@ -53,6 +60,13 @@ const GameFrame: React.FC<GameFrameProps> = ({ sessionId, studentId }) => {
       window.removeEventListener('message', handleGameMessage);
     };
   }, [sessionId, studentId]);
+
+  // When dialog closes and reopens, ensure we send IDs again
+  useEffect(() => {
+    if (isOpen && iframeRef.current) {
+      sendIdsToGame(iframeRef.current);
+    }
+  }, [isOpen]);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
