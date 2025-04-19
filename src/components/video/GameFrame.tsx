@@ -10,28 +10,32 @@ interface GameFrameProps {
 const GameFrame: React.FC<GameFrameProps> = ({ sessionId, studentId }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [isOpen, setIsOpen] = useState(true);
+  const [iframeLoaded, setIframeLoaded] = useState(false);
   const gameUrl = 'https://preview--confetti-square-celebration.lovable.app';
 
   // Function to send IDs to the game iframe
-  const sendIdsToGame = (iframe: HTMLIFrameElement) => {
-    if (iframe?.contentWindow) {
-      iframe.contentWindow.postMessage(
-        {
-          type: 'INIT_GAME',
-          data: {
-            student_id: studentId,
-            student_session: sessionId,
-          }
-        },
-        '*'
-      );
-      console.log('Init game message sent to iframe');
+  const sendIdsToGame = () => {
+    if (iframeRef.current?.contentWindow) {
+      const message = {
+        type: 'INIT_GAME',
+        data: {
+          student_id: studentId || 'default-student',
+          student_session: sessionId,
+        }
+      };
+      
+      iframeRef.current.contentWindow.postMessage(message, '*');
+      console.log('Init game message sent to iframe with data:', JSON.stringify(message.data));
+    } else {
+      console.error('Cannot send message - iframe or contentWindow is null');
     }
   };
 
   useEffect(() => {
     // Handle messages from the game
     const handleGameMessage = (event: MessageEvent) => {
+      console.log('Received message from iframe:', event.data);
+      
       if (event.data?.type === "game_finished") {
         console.log("✅ Game is finished!");
         setIsOpen(false);
@@ -41,11 +45,16 @@ const GameFrame: React.FC<GameFrameProps> = ({ sessionId, studentId }) => {
     // Add event listener for game messages
     window.addEventListener('message', handleGameMessage);
 
-    // Wait for iframe to load before sending the message
+    return () => {
+      window.removeEventListener('message', handleGameMessage);
+    };
+  }, []);
+
+  // Handle iframe load event
+  useEffect(() => {
     const handleIframeLoad = () => {
-      if (iframeRef.current) {
-        sendIdsToGame(iframeRef.current);
-      }
+      console.log('Iframe loaded, setting loaded state to true');
+      setIframeLoaded(true);
     };
 
     const iframe = iframeRef.current;
@@ -57,14 +66,22 @@ const GameFrame: React.FC<GameFrameProps> = ({ sessionId, studentId }) => {
       if (iframe) {
         iframe.removeEventListener('load', handleIframeLoad);
       }
-      window.removeEventListener('message', handleGameMessage);
     };
-  }, [sessionId, studentId]);
+  }, []);
+
+  // Send IDs to the game when the iframe is loaded or when IDs change
+  useEffect(() => {
+    if (iframeLoaded) {
+      console.log('Iframe is loaded, sending IDs...');
+      sendIdsToGame();
+    }
+  }, [iframeLoaded, sessionId, studentId]);
 
   // When dialog closes and reopens, ensure we send IDs again
   useEffect(() => {
-    if (isOpen && iframeRef.current) {
-      sendIdsToGame(iframeRef.current);
+    if (isOpen && iframeLoaded) {
+      console.log('Dialog opened, sending IDs...');
+      sendIdsToGame();
     }
   }, [isOpen]);
 
