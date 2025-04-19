@@ -32,7 +32,10 @@ const GameFrame: React.FC<GameFrameProps> = ({ sessionId, studentId }) => {
     const handleGameMessage = (event: MessageEvent) => {
       if (event.origin === 'https://preview--confetti-square-celebration.lovable.app') {
         if (event.data.type === 'GAME_COMPLETE') {
-          setIsOpen(false);
+          // Add a 7-second delay before closing the iframe
+          setTimeout(() => {
+            setIsOpen(false);
+          }, 7000);
         }
       }
     };
@@ -69,4 +72,3 @@ const GameFrame: React.FC<GameFrameProps> = ({ sessionId, studentId }) => {
 };
 
 export default GameFrame;
-
