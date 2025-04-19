@@ -1,5 +1,6 @@
 
 import { useEffect } from 'react';
+import { RefObject } from 'react';
 import { useVideoTransition } from './video/useVideoTransition';
 import { useVideoOverlay } from './video/useVideoOverlay';
 import { useIframeState } from './video/useIframeState';
@@ -58,7 +59,8 @@ export const useVideoSequence = ({
   const { handleVideoSequence } = useVideoSequenceLogic({
     playNextVideo,
     setShowIframe,
-    handleOverlayTransition
+    handleOverlayTransition,
+    recordProgress // Pass recordProgress to useVideoSequenceLogic
   });
 
   const { jumpToVideo } = useJumpToVideo({

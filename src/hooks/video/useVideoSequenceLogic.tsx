@@ -1,16 +1,17 @@
-
 import { useCallback } from 'react';
 
 interface UseVideoSequenceLogicProps {
   playNextVideo: (nextSrc: string, nextIndex: number) => Promise<void>;
   setShowIframe: (show: boolean) => void;
   handleOverlayTransition: () => Promise<void>;
+  recordProgress: (src: string, completed?: boolean) => Promise<void>;
 }
 
 export const useVideoSequenceLogic = ({
   playNextVideo,
   setShowIframe,
-  handleOverlayTransition
+  handleOverlayTransition,
+  recordProgress
 }: UseVideoSequenceLogicProps) => {
   const handleVideoSequence = useCallback(async (
     currentSrc: string,
@@ -77,7 +78,7 @@ export const useVideoSequenceLogic = ({
         await recordProgress(thirteenthVideoSrc!, true);
         break;
     }
-  }, [playNextVideo, setShowIframe, handleOverlayTransition]);
+  }, [playNextVideo, setShowIframe, handleOverlayTransition, recordProgress]);
 
   return { handleVideoSequence };
 };

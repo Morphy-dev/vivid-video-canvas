@@ -1,5 +1,6 @@
 
 import { useCallback } from 'react';
+import { RefObject } from 'react'; // Add the missing import
 
 interface UseJumpToVideoProps {
   setShowIframe: (show: boolean) => void;
