@@ -9,6 +9,13 @@ interface UseVideoSequenceProps {
   fourthVideoSrc?: string;
   fifthVideoSrc?: string;
   sixthVideoSrc?: string;
+  seventhVideoSrc?: string;
+  eighthVideoSrc?: string;
+  ninthVideoSrc?: string;
+  tenthVideoSrc?: string;
+  eleventhVideoSrc?: string;
+  twelfthVideoSrc?: string;
+  thirteenthVideoSrc?: string;
   studentId?: string;
   sessionId: string;
   videoRef: RefObject<HTMLVideoElement>;
@@ -29,6 +36,13 @@ export const useVideoSequence = ({
   fourthVideoSrc,
   fifthVideoSrc,
   sixthVideoSrc,
+  seventhVideoSrc,
+  eighthVideoSrc,
+  ninthVideoSrc,
+  tenthVideoSrc,
+  eleventhVideoSrc,
+  twelfthVideoSrc,
+  thirteenthVideoSrc,
   studentId,
   sessionId,
   videoRef,
@@ -90,7 +104,28 @@ export const useVideoSequence = ({
         if (sixthVideoSrc) await playNextVideo(sixthVideoSrc, 6);
         break;
       case 6:
-        await recordProgress(sixthVideoSrc!, true);
+        if (seventhVideoSrc) await playNextVideo(seventhVideoSrc, 7);
+        break;
+      case 7:
+        if (eighthVideoSrc) await playNextVideo(eighthVideoSrc, 8);
+        break;
+      case 8:
+        if (ninthVideoSrc) await playNextVideo(ninthVideoSrc, 9);
+        break;
+      case 9:
+        if (tenthVideoSrc) await playNextVideo(tenthVideoSrc, 10);
+        break;
+      case 10:
+        if (eleventhVideoSrc) await playNextVideo(eleventhVideoSrc, 11);
+        break;
+      case 11:
+        if (twelfthVideoSrc) await playNextVideo(twelfthVideoSrc, 12);
+        break;
+      case 12:
+        if (thirteenthVideoSrc) await playNextVideo(thirteenthVideoSrc, 13);
+        break;
+      case 13:
+        await recordProgress(thirteenthVideoSrc!, true);
         setShowIframe(true);
         break;
     }

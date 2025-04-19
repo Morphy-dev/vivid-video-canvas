@@ -16,6 +16,13 @@ interface VideoCanvasProps {
   fourthVideoSrc?: string;
   fifthVideoSrc?: string;
   sixthVideoSrc?: string;
+  seventhVideoSrc?: string;
+  eighthVideoSrc?: string;
+  ninthVideoSrc?: string;
+  tenthVideoSrc?: string;
+  eleventhVideoSrc?: string;
+  twelfthVideoSrc?: string;
+  thirteenthVideoSrc?: string;
   studentId?: string;
 }
 
@@ -28,6 +35,13 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   fourthVideoSrc,
   fifthVideoSrc,
   sixthVideoSrc,
+  seventhVideoSrc,
+  eighthVideoSrc,
+  ninthVideoSrc,
+  tenthVideoSrc,
+  eleventhVideoSrc,
+  twelfthVideoSrc,
+  thirteenthVideoSrc,
   studentId
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -36,6 +50,13 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   const fourthVideoRef = useRef<HTMLVideoElement>(null);
   const fifthVideoRef = useRef<HTMLVideoElement>(null);
   const sixthVideoRef = useRef<HTMLVideoElement>(null);
+  const seventhVideoRef = useRef<HTMLVideoElement>(null);
+  const eighthVideoRef = useRef<HTMLVideoElement>(null);
+  const ninthVideoRef = useRef<HTMLVideoElement>(null);
+  const tenthVideoRef = useRef<HTMLVideoElement>(null);
+  const eleventhVideoRef = useRef<HTMLVideoElement>(null);
+  const twelfthVideoRef = useRef<HTMLVideoElement>(null);
+  const thirteenthVideoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   
   const [isPlaying, setIsPlaying] = useState(autoPlay);
@@ -50,6 +71,13 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
     fourthVideoSrc,
     fifthVideoSrc,
     sixthVideoSrc,
+    seventhVideoSrc,
+    eighthVideoSrc,
+    ninthVideoSrc,
+    tenthVideoSrc,
+    eleventhVideoSrc,
+    twelfthVideoSrc,
+    thirteenthVideoSrc,
     studentId,
     sessionId,
     videoRef,
@@ -92,8 +120,34 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
             />
             
             <PreloadedVideos
-              sources={[nextVideoSrc, thirdVideoSrc, fourthVideoSrc, fifthVideoSrc, sixthVideoSrc]}
-              refs={[nextVideoRef, thirdVideoRef, fourthVideoRef, fifthVideoRef, sixthVideoRef]}
+              sources={[
+                nextVideoSrc, 
+                thirdVideoSrc, 
+                fourthVideoSrc, 
+                fifthVideoSrc, 
+                sixthVideoSrc,
+                seventhVideoSrc,
+                eighthVideoSrc,
+                ninthVideoSrc,
+                tenthVideoSrc,
+                eleventhVideoSrc,
+                twelfthVideoSrc,
+                thirteenthVideoSrc
+              ]}
+              refs={[
+                nextVideoRef, 
+                thirdVideoRef, 
+                fourthVideoRef, 
+                fifthVideoRef, 
+                sixthVideoRef,
+                seventhVideoRef,
+                eighthVideoRef,
+                ninthVideoRef,
+                tenthVideoRef,
+                eleventhVideoRef,
+                twelfthVideoRef,
+                thirteenthVideoRef
+              ]}
             />
             
             <VideoOverlay show={showOverlay} imageSrc={dayAssets.image} />
@@ -119,4 +173,3 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
 };
 
 export default VideoCanvas;
-
