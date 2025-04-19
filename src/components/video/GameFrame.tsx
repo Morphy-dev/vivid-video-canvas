@@ -30,34 +30,15 @@ const GameFrame: React.FC<GameFrameProps> = ({ sessionId, studentId }) => {
       }
     };
 
-    // Handle messages from the game
-    const handleGameMessage = (event: MessageEvent) => {
-      console.log('Message received:', event); // Log all received messages
-      console.log('Origin:', event.origin); // Log the origin of the message
-      console.log('Message data:', event.data); // Log the message data
-
-      // Accept messages from any origin that have the correct message type
-      if (event.data && event.data.type === 'GAME_COMPLETE') {
-        console.log('Game complete message received'); // Confirm game complete message
-        
-        // Add a 7-second delay before closing the iframe
-        setTimeout(() => {
-          setIsOpen(false);
-        }, 7000);
-      }
-    };
-
     const iframe = iframeRef.current;
     if (iframe) {
       iframe.addEventListener('load', handleIframeLoad);
-      window.addEventListener('message', handleGameMessage);
     }
 
     return () => {
       if (iframe) {
         iframe.removeEventListener('load', handleIframeLoad);
       }
-      window.removeEventListener('message', handleGameMessage);
     };
   }, [sessionId, studentId]);
 
