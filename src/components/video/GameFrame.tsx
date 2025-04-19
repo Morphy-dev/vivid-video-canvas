@@ -12,7 +12,12 @@ const GameFrame: React.FC<GameFrameProps> = ({ sessionId, studentId }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [iframeLoaded, setIframeLoaded] = useState(false);
   const [messageSent, setMessageSent] = useState(false);
-  const gameUrl = 'https://preview--confetti-square-celebration.lovable.app';
+  const [currentGame, setCurrentGame] = useState<'confetti' | 'picker'>('confetti');
+  
+  const gameUrls = {
+    confetti: 'https://preview--confetti-square-celebration.lovable.app',
+    picker: 'https://preview--item-picker-fall.lovable.app'
+  };
 
   // Function to send IDs to the game iframe
   const sendIdsToGame = () => {
@@ -45,7 +50,15 @@ const GameFrame: React.FC<GameFrameProps> = ({ sessionId, studentId }) => {
         
         if (event.data?.type === "game_finished") {
           console.log("🎮 Game is finished!");
-          setIsOpen(false);
+          if (currentGame === 'confetti') {
+            // Switch to the picker game
+            setCurrentGame('picker');
+            setIframeLoaded(false);
+            setMessageSent(false);
+          } else {
+            // Both games are finished, close the dialog
+            setIsOpen(false);
+          }
         }
         
         // Log acknowledgement if the game confirms receiving the IDs
@@ -59,7 +72,7 @@ const GameFrame: React.FC<GameFrameProps> = ({ sessionId, studentId }) => {
     return () => {
       window.removeEventListener('message', handleGameMessage);
     };
-  }, []);
+  }, [currentGame]);
 
   // Handle iframe load event
   useEffect(() => {
@@ -131,7 +144,7 @@ const GameFrame: React.FC<GameFrameProps> = ({ sessionId, studentId }) => {
         <DialogTitle className="sr-only">Game</DialogTitle>
         <iframe
           ref={iframeRef}
-          src={gameUrl}
+          src={gameUrls[currentGame]}
           frameBorder="0"
           width="100%"
           height="100%"
