@@ -10,6 +10,7 @@ interface VideoContainerWrapperProps {
     currentVideoIndex: number;
     showIframe: boolean;
     showSecondIframe: boolean;
+    showThirdIframe: boolean;
     showOverlay: boolean;
   };
   isPlaying: boolean;
@@ -41,7 +42,7 @@ const VideoContainerWrapper: React.FC<VideoContainerWrapperProps> = ({
   return (
     <div className={`relative w-full max-w-6xl mx-auto ${className}`}>
       <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
-        {!sequence.showIframe && !sequence.showSecondIframe && (
+        {!sequence.showIframe && !sequence.showSecondIframe && !sequence.showThirdIframe && (
           <VideoContainer
             currentSrc={sequence.currentSrc}
             isPlaying={isPlaying}
@@ -73,10 +74,16 @@ const VideoContainerWrapper: React.FC<VideoContainerWrapperProps> = ({
             gameUrl="https://preview--item-picker-fall.lovable.app"
           />
         )}
+        {sequence.showThirdIframe && (
+          <GameFrame
+            sessionId={sessionId}
+            studentId={studentId}
+            gameUrl="https://preview--sunny-day-selector.lovable.app/"
+          />
+        )}
       </div>
     </div>
   );
 };
 
 export default VideoContainerWrapper;
-

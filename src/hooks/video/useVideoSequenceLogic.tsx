@@ -1,9 +1,10 @@
-
 import { useCallback } from 'react';
 
 interface UseVideoSequenceLogicProps {
   playNextVideo: (nextSrc: string, nextIndex: number) => Promise<void>;
   setShowIframe: (show: boolean) => void;
+  setShowSecondIframe: (show: boolean) => void;
+  setShowThirdIframe: (show: boolean) => void;
   handleOverlayTransition: () => Promise<void>;
   recordProgress: (src: string, completed?: boolean) => Promise<void>;
 }
@@ -26,6 +27,8 @@ interface VideoSources {
 export const useVideoSequenceLogic = ({
   playNextVideo,
   setShowIframe,
+  setShowSecondIframe,
+  setShowThirdIframe,
   handleOverlayTransition,
   recordProgress
 }: UseVideoSequenceLogicProps) => {
@@ -40,6 +43,7 @@ export const useVideoSequenceLogic = ({
       fourthVideoSrc,
       fifthVideoSrc,
       sixthVideoSrc,
+      seventhVideoSrc,
       eighthVideoSrc,
       ninthVideoSrc,
       tenthVideoSrc,
@@ -73,22 +77,22 @@ export const useVideoSequenceLogic = ({
         setShowIframe(true);
         break;
       case 7:
-        if (eighthVideoSrc) await playNextVideo(eighthVideoSrc, 8);
+        setShowThirdIframe(true);
         break;
       case 8:
-        if (ninthVideoSrc) await playNextVideo(ninthVideoSrc, 9);
+        if (eighthVideoSrc) await playNextVideo(eighthVideoSrc, 8);
         break;
       case 9:
-        if (tenthVideoSrc) await playNextVideo(tenthVideoSrc, 10);
+        if (ninthVideoSrc) await playNextVideo(ninthVideoSrc, 9);
         break;
       case 10:
-        if (eleventhVideoSrc) await playNextVideo(eleventhVideoSrc, 11);
+        if (tenthVideoSrc) await playNextVideo(tenthVideoSrc, 10);
         break;
       case 11:
-        if (twelfthVideoSrc) await playNextVideo(twelfthVideoSrc, 12);
+        if (eleventhVideoSrc) await playNextVideo(eleventhVideoSrc, 11);
         break;
       case 12:
-        if (thirteenthVideoSrc) await playNextVideo(thirteenthVideoSrc, 13);
+        if (twelfthVideoSrc) await playNextVideo(twelfthVideoSrc, 12);
         break;
       case 13:
         if (thirteenthVideoSrc) {
@@ -96,7 +100,7 @@ export const useVideoSequenceLogic = ({
         }
         break;
     }
-  }, [playNextVideo, setShowIframe, handleOverlayTransition, recordProgress]);
+  }, [playNextVideo, setShowIframe, setShowSecondIframe, setShowThirdIframe, handleOverlayTransition, recordProgress]);
 
   return { handleVideoSequence };
 };

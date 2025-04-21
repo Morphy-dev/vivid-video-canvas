@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 import { RefObject } from 'react';
 import { useVideoTransition } from './video/useVideoTransition';
@@ -68,10 +67,11 @@ export const useVideoSequence = ({
     setShowIframe, 
     showSecondIframe, 
     setShowSecondIframe,
+    showThirdIframe,
+    setShowThirdIframe,
     handleGameMessage 
   } = useIframeState();
 
-  // Extract only video sources for passing to handleVideoSequence
   const videoSources = {
     nextVideoSrc,
     thirdVideoSrc,
@@ -90,6 +90,8 @@ export const useVideoSequence = ({
   const { handleVideoSequence } = useVideoSequenceLogic({
     playNextVideo,
     setShowIframe,
+    setShowSecondIframe,
+    setShowThirdIframe,
     handleOverlayTransition,
     recordProgress
   });
@@ -109,7 +111,7 @@ export const useVideoSequence = ({
 
     window.addEventListener('message', messageHandler);
     return () => window.removeEventListener('message', messageHandler);
-  }, [showIframe, showSecondIframe, seventhVideoSrc]);
+  }, [showIframe, showSecondIframe, showThirdIframe, seventhVideoSrc]);
 
   useEffect(() => {
     const handleEnded = () => {
@@ -145,6 +147,7 @@ export const useVideoSequence = ({
     showOverlay,
     showIframe,
     showSecondIframe,
+    showThirdIframe,
     jumpToVideo: jumpToVideoWrapper
   };
 };
