@@ -1,10 +1,10 @@
-
 import React, { useRef, useState, useEffect } from 'react';
 import { useVideoSequence } from '../../hooks/useVideoSequence';
 import { getCurrentDayAssets } from '../../utils/dayAssets';
 import VideoContainer from './VideoContainer';
 import VideoIndex from './VideoIndex';
 import GameFrame from './GameFrame';
+import IntroFrame from "./IntroFrame";
 
 const INTRO_IMAGE_URL = "https://ksnyoasamhyunakuqdst.supabase.co/storage/v1/object/public/other//Semana01_Escena-06-v3.png";
 
@@ -12,6 +12,19 @@ const VideoWrapper = ({
   src,
   className = '',
   autoPlay = false,
+  nextVideoSrc,
+  thirdVideoSrc,
+  fourthVideoSrc,
+  fifthVideoSrc,
+  sixthVideoSrc,
+  seventhVideoSrc,
+  eighthVideoSrc,
+  ninthVideoSrc,
+  tenthVideoSrc,
+  eleventhVideoSrc,
+  twelfthVideoSrc,
+  thirteenthVideoSrc,
+  studentId,
   ...videoProps
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -36,43 +49,30 @@ const VideoWrapper = ({
   const [showIndex, setShowIndex] = useState(true);
 
   // PRE-VIDEO: Show intro image and day image state.
-  const [showIntroImage, setShowIntroImage] = useState(true);
+  const [showIntroFrame, setShowIntroFrame] = useState(true);
 
-  // Day-specific assets:
+  // Day-specific assets
   const dayAssets = getCurrentDayAssets();
+
+  // Show intro frame before the first video
+  // const [showIntroImage, setShowIntroImage] = useState(true);
 
   // Use intro effect only once at component mount
   useEffect(() => {
-    setShowIntroImage(true);
+    // On mount, show intro frame; reset first video to paused.
+    setShowIntroFrame(true);
     setIsPlaying(false);
-
-    // Play the audio for the day when intro image appears
-    if (introAudioRef.current) {
-      introAudioRef.current.currentTime = 0;
-      introAudioRef.current.volume = 1.0;
-      introAudioRef.current.play().catch(() => {});
-    }
-
-    const introTimeout = setTimeout(() => {
-      setShowIntroImage(false);
-      // Play the first video after image, but NOT if showIndex is open (menu visible)
-      if (!showIndex && videoRef.current) {
-        videoRef.current.play();
-        setIsPlaying(true);
-      }
-    }, 4000);
-
-    return () => clearTimeout(introTimeout);
-    // eslint-disable-next-line
+    // Don't preload/play here, handled in IntroFrame
   }, []);
 
+  // After intro frame is gone and not showing index, play video automatically
   useEffect(() => {
-    if (!showIntroImage && !showIndex && videoRef.current && !isPlaying) {
+    if (!showIntroFrame && !showIndex && videoRef.current && !isPlaying) {
       videoRef.current.play();
       setIsPlaying(true);
     }
     // eslint-disable-next-line
-  }, [showIntroImage, showIndex]);
+  }, [showIntroFrame, showIndex]);
 
   // useVideoSequence hook MUST come after dayAssets for audioRef
   const { 
@@ -88,6 +88,18 @@ const VideoWrapper = ({
     sessionId,
     videoRef,
     audioRef: nextVideoRef, // not needed for the intro anymore
+    nextVideoSrc,
+    thirdVideoSrc,
+    fourthVideoSrc,
+    fifthVideoSrc,
+    sixthVideoSrc,
+    seventhVideoSrc,
+    eighthVideoSrc,
+    ninthVideoSrc,
+    tenthVideoSrc,
+    eleventhVideoSrc,
+    twelfthVideoSrc,
+    thirteenthVideoSrc,
     ...videoProps
   });
 
@@ -134,32 +146,17 @@ const VideoWrapper = ({
     { index: 13, label: "Video 13", src: videoProps.thirteenthVideoSrc },
   ].filter(video => video.src);
 
-  // Show the intro image (scene background) PLUS day image (only for 4s), no "Today is..."
-  if (showIntroImage && !showIndex) {
+  // IntroFrame: show only BEFORE the first video
+  if (showIntroFrame && !showIndex) {
     return (
       <div className={`relative w-full max-w-6xl mx-auto ${className}`}>
-        <div className="relative w-full flex flex-col items-center justify-center" style={{ aspectRatio: "16/9" }}>
-          {/* Background image/scene */}
-          <img 
-            className="absolute inset-0 w-full h-full object-cover rounded-lg shadow-xl"
-            src={INTRO_IMAGE_URL}
-            alt="Intro"
-            style={{ zIndex: 1 }}
-          />
-          {/* Day-of-week image */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ zIndex: 2 }}>
-            <img
-              src={dayAssets.image}
-              alt="Day of the week"
-              className="h-[38vh] w-auto object-contain drop-shadow-lg rounded-md"
-            />
-          </div>
-          <audio 
-            ref={introAudioRef}
-            src={dayAssets.sound}
-            preload="auto"
-          />
-        </div>
+        <IntroFrame
+          show={true}
+          onFinish={() => setShowIntroFrame(false)}
+          dayImage={dayAssets.image}
+          daySound={dayAssets.sound}
+          backgroundUrl={INTRO_IMAGE_URL}
+        />
       </div>
     );
   }
@@ -225,28 +222,24 @@ const VideoWrapper = ({
             showDayOverlay={false}
           />
         )}
-
         {showIframe && (
-          <GameFrame 
-            sessionId={sessionId} 
-            studentId={videoProps.studentId} 
+          <GameFrame
+            sessionId={sessionId}
+            studentId={videoProps.studentId}
             gameUrl="https://preview--confetti-square-celebration.lovable.app"
           />
         )}
-
         {showSecondIframe && (
-          <GameFrame 
-            sessionId={sessionId} 
-            studentId={videoProps.studentId} 
+          <GameFrame
+            sessionId={sessionId}
+            studentId={videoProps.studentId}
             gameUrl="https://preview--item-picker-fall.lovable.app"
           />
         )}
-
-        {/* Remove audio tag for post-intro as day sound only plays at intro */}
+      {/* Remove audio/post-intro overlays. All day content is now ONLY in intro frame. */}
       </div>
     </div>
   );
 };
 
 export default VideoWrapper;
-
