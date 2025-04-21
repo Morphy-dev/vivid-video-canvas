@@ -1,31 +1,14 @@
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useVideoSequence } from '../../hooks/useVideoSequence';
 import { getCurrentDayAssets } from '../../utils/dayAssets';
 import VideoContainer from './VideoContainer';
 import VideoIndex from './VideoIndex';
 import GameFrame from './GameFrame';
 
-interface VideoWrapperProps {
-  src: string;
-  className?: string;
-  autoPlay?: boolean;
-  nextVideoSrc?: string;
-  thirdVideoSrc?: string;
-  fourthVideoSrc?: string;
-  fifthVideoSrc?: string;
-  sixthVideoSrc?: string;
-  seventhVideoSrc?: string;
-  eighthVideoSrc?: string;
-  ninthVideoSrc?: string;
-  tenthVideoSrc?: string;
-  eleventhVideoSrc?: string;
-  twelfthVideoSrc?: string;
-  thirteenthVideoSrc?: string;
-  studentId?: string;
-}
+const INTRO_IMAGE_URL = "https://ksnyoasamhyunakuqdst.supabase.co/storage/v1/object/public/other//Semana01_Escena-06-v3.png";
 
-const VideoWrapper: React.FC<VideoWrapperProps> = ({
+const VideoWrapper = ({
   src,
   className = '',
   autoPlay = false,
@@ -45,11 +28,40 @@ const VideoWrapper: React.FC<VideoWrapperProps> = ({
   const twelfthVideoRef = useRef<HTMLVideoElement>(null);
   const thirteenthVideoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
-  
+
   const [isPlaying, setIsPlaying] = useState(autoPlay);
   const [sessionId] = useState(() => crypto.randomUUID());
   const [showIndex, setShowIndex] = useState(true);
-  
+
+  // --- NEW: Intro image display state ---
+  const [showIntroImage, setShowIntroImage] = useState(true);
+
+  // Use intro effect only once at component mount
+  useEffect(() => {
+    setShowIntroImage(true);
+    setIsPlaying(false);
+    const introTimeout = setTimeout(() => {
+      setShowIntroImage(false);
+      // Play the first video after image, but NOT if showIndex is open (menu visible)
+      if (!showIndex && videoRef.current) {
+        videoRef.current.play();
+        setIsPlaying(true);
+      }
+    }, 4000);
+
+    return () => clearTimeout(introTimeout);
+    // eslint-disable-next-line
+  }, []);
+
+  useEffect(() => {
+    // If exiting index while intro is gone, auto start
+    if (!showIntroImage && !showIndex && videoRef.current && !isPlaying) {
+      videoRef.current.play();
+      setIsPlaying(true);
+    }
+    // eslint-disable-next-line
+  }, [showIntroImage, showIndex]);
+
   const dayAssets = getCurrentDayAssets();
 
   const { 
@@ -111,6 +123,26 @@ const VideoWrapper: React.FC<VideoWrapperProps> = ({
     { index: 13, label: "Video 13", src: videoProps.thirteenthVideoSrc },
   ].filter(video => video.src);
 
+  // Show the intro image + message before the first video
+  if (showIntroImage && !showIndex) {
+    return (
+      <div className={`relative w-full max-w-6xl mx-auto ${className}`}>
+        <div className="relative w-full flex flex-col items-center justify-center" style={{ aspectRatio: '16/9' }}>
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-80">
+            <img 
+              src={INTRO_IMAGE_URL}
+              alt="Intro" 
+              className="max-h-[70vh] w-auto mx-auto rounded-lg shadow-xl animate-fade-in"
+            />
+            <p className="mt-6 text-4xl md:text-5xl lg:text-6xl font-bold drop-shadow-xl text-white animate-fade-in">
+              Today is...
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (showIndex) {
     return (
       <VideoIndex 
@@ -158,7 +190,10 @@ const VideoWrapper: React.FC<VideoWrapperProps> = ({
           <VideoContainer
             currentSrc={currentSrc}
             isPlaying={isPlaying}
-            showOverlay={showOverlay}
+            showOverlay={
+              // Only show overlay for days after video 1
+              currentVideoIndex !== 1 && showOverlay
+            }
             onPlayPause={handlePlayPause}
             onFullscreen={handleFullscreen}
             onShowIndex={() => setShowIndex(true)}
@@ -166,9 +201,11 @@ const VideoWrapper: React.FC<VideoWrapperProps> = ({
             preloadedRefs={preloadedRefs}
             videoRef={videoRef}
             overlayImageSrc={dayAssets.image}
+            // No "Today is..." overlay after the intro image!
+            showDayOverlay={false}
           />
         )}
-        
+
         {showIframe && (
           <GameFrame 
             sessionId={sessionId} 
@@ -176,7 +213,7 @@ const VideoWrapper: React.FC<VideoWrapperProps> = ({
             gameUrl="https://preview--confetti-square-celebration.lovable.app"
           />
         )}
-        
+
         {showSecondIframe && (
           <GameFrame 
             sessionId={sessionId} 

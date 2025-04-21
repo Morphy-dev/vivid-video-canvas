@@ -1,23 +1,10 @@
 
-import React, { useRef } from 'react';
+import React from 'react';
 import VideoControls from '../VideoControls';
 import VideoOverlay from './VideoOverlay';
 import PreloadedVideos from './PreloadedVideos';
 
-interface VideoContainerProps {
-  currentSrc: string;
-  isPlaying: boolean;
-  showOverlay: boolean;
-  onPlayPause: () => void;
-  onFullscreen: () => void;
-  onShowIndex: () => void;
-  preloadedSources: (string | undefined)[];
-  preloadedRefs: React.RefObject<HTMLVideoElement>[];
-  videoRef: React.RefObject<HTMLVideoElement>;
-  overlayImageSrc: string;
-}
-
-const VideoContainer: React.FC<VideoContainerProps> = ({
+const VideoContainer = ({
   currentSrc,
   isPlaying,
   showOverlay,
@@ -28,6 +15,7 @@ const VideoContainer: React.FC<VideoContainerProps> = ({
   preloadedRefs,
   videoRef,
   overlayImageSrc,
+  showDayOverlay = false
 }) => {
   return (
     <>
@@ -39,14 +27,13 @@ const VideoContainer: React.FC<VideoContainerProps> = ({
         preload="auto" 
         className="absolute inset-0 w-full h-full object-contain" 
       />
-      
       <PreloadedVideos
         sources={preloadedSources}
         refs={preloadedRefs}
       />
-      
-      <VideoOverlay show={showOverlay} imageSrc={overlayImageSrc} />
-      
+      {showOverlay && <VideoOverlay show={true} imageSrc={overlayImageSrc} />}
+      {/* The day overlay (`Today is...`) shown only via intro image now */}
+      {/* {showDayOverlay && ...} */}
       <VideoControls 
         isPlaying={isPlaying} 
         onPlayPause={onPlayPause} 
