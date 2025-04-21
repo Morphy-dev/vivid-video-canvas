@@ -27,19 +27,32 @@ const VideoWrapper = ({
   const eleventhVideoRef = useRef<HTMLVideoElement>(null);
   const twelfthVideoRef = useRef<HTMLVideoElement>(null);
   const thirteenthVideoRef = useRef<HTMLVideoElement>(null);
-  const audioRef = useRef<HTMLAudioElement>(null);
+
+  // PRE-VIDEO AUDIO: new!
+  const introAudioRef = useRef<HTMLAudioElement>(null);
 
   const [isPlaying, setIsPlaying] = useState(autoPlay);
   const [sessionId] = useState(() => crypto.randomUUID());
   const [showIndex, setShowIndex] = useState(true);
 
-  // --- NEW: Intro image display state ---
+  // PRE-VIDEO: Show intro image and day image state.
   const [showIntroImage, setShowIntroImage] = useState(true);
+
+  // Day-specific assets:
+  const dayAssets = getCurrentDayAssets();
 
   // Use intro effect only once at component mount
   useEffect(() => {
     setShowIntroImage(true);
     setIsPlaying(false);
+
+    // Play the audio for the day when intro image appears
+    if (introAudioRef.current) {
+      introAudioRef.current.currentTime = 0;
+      introAudioRef.current.volume = 1.0;
+      introAudioRef.current.play().catch(() => {});
+    }
+
     const introTimeout = setTimeout(() => {
       setShowIntroImage(false);
       // Play the first video after image, but NOT if showIndex is open (menu visible)
@@ -54,7 +67,6 @@ const VideoWrapper = ({
   }, []);
 
   useEffect(() => {
-    // If exiting index while intro is gone, auto start
     if (!showIntroImage && !showIndex && videoRef.current && !isPlaying) {
       videoRef.current.play();
       setIsPlaying(true);
@@ -62,8 +74,7 @@ const VideoWrapper = ({
     // eslint-disable-next-line
   }, [showIntroImage, showIndex]);
 
-  const dayAssets = getCurrentDayAssets();
-
+  // useVideoSequence hook MUST come after dayAssets for audioRef
   const { 
     currentSrc, 
     showOverlay, 
@@ -76,7 +87,7 @@ const VideoWrapper = ({
     studentId: videoProps.studentId,
     sessionId,
     videoRef,
-    audioRef,
+    audioRef: nextVideoRef, // not needed for the intro anymore
     ...videoProps
   });
 
@@ -123,21 +134,31 @@ const VideoWrapper = ({
     { index: 13, label: "Video 13", src: videoProps.thirteenthVideoSrc },
   ].filter(video => video.src);
 
-  // Show the intro image + message before the first video
+  // Show the intro image (scene background) PLUS day image (only for 4s), no "Today is..."
   if (showIntroImage && !showIndex) {
     return (
       <div className={`relative w-full max-w-6xl mx-auto ${className}`}>
-        <div className="relative w-full flex flex-col items-center justify-center" style={{ aspectRatio: '16/9' }}>
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-80">
-            <img 
-              src={INTRO_IMAGE_URL}
-              alt="Intro" 
-              className="max-h-[70vh] w-auto mx-auto rounded-lg shadow-xl animate-fade-in"
+        <div className="relative w-full flex flex-col items-center justify-center" style={{ aspectRatio: "16/9" }}>
+          {/* Background image/scene */}
+          <img 
+            className="absolute inset-0 w-full h-full object-cover rounded-lg shadow-xl"
+            src={INTRO_IMAGE_URL}
+            alt="Intro"
+            style={{ zIndex: 1 }}
+          />
+          {/* Day-of-week image */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ zIndex: 2 }}>
+            <img
+              src={dayAssets.image}
+              alt="Day of the week"
+              className="h-[38vh] w-auto object-contain drop-shadow-lg rounded-md"
             />
-            <p className="mt-6 text-4xl md:text-5xl lg:text-6xl font-bold drop-shadow-xl text-white animate-fade-in">
-              Today is...
-            </p>
           </div>
+          <audio 
+            ref={introAudioRef}
+            src={dayAssets.sound}
+            preload="auto"
+          />
         </div>
       </div>
     );
@@ -185,7 +206,7 @@ const VideoWrapper = ({
 
   return (
     <div className={`relative w-full max-w-6xl mx-auto ${className}`}>
-      <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
+      <div className="relative w-full" style={{ aspectRatio: "16/9" }}>
         {!showIframe && !showSecondIframe && (
           <VideoContainer
             currentSrc={currentSrc}
@@ -201,7 +222,6 @@ const VideoWrapper = ({
             preloadedRefs={preloadedRefs}
             videoRef={videoRef}
             overlayImageSrc={dayAssets.image}
-            // No "Today is..." overlay after the intro image!
             showDayOverlay={false}
           />
         )}
@@ -222,14 +242,11 @@ const VideoWrapper = ({
           />
         )}
 
-        <audio 
-          ref={audioRef} 
-          src={dayAssets.sound}
-          preload="auto"
-        />
+        {/* Remove audio tag for post-intro as day sound only plays at intro */}
       </div>
     </div>
   );
 };
 
 export default VideoWrapper;
+
