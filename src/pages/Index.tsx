@@ -24,14 +24,12 @@ const Index = () => {
 
   const handleGroupFound = async (foundGroupId: string) => {
     try {
-      // Fetch students for the group
       const { data: studentsData, error: studentsError } = await supabase
         .from('estudiantes')
         .select('id, nombre_completo, foto_url, grupo_id')
         .eq('grupo_id', foundGroupId)
         .eq('status', true);
 
-      // Fetch school name
       const { data: groupData, error: groupError } = await supabase
         .from('grupos')
         .select('instituciones(nombre)')
@@ -71,7 +69,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-soft-gray relative flex items-center justify-center p-8">
-      {/* Student and School Info in Top Right Corner */}
       <div className="absolute top-4 right-4 text-right z-10">
         <div className="flex items-center justify-end space-x-2">
           <Avatar className="w-12 h-12">

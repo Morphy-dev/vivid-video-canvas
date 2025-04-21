@@ -90,6 +90,7 @@ export const useVideoSequence = ({
   const { handleVideoSequence } = useVideoSequenceLogic({
     playNextVideo,
     setShowIframe,
+    setShowSecondIframe,
     handleOverlayTransition,
     recordProgress
   });
@@ -109,7 +110,7 @@ export const useVideoSequence = ({
 
     window.addEventListener('message', messageHandler);
     return () => window.removeEventListener('message', messageHandler);
-  }, [showIframe, showSecondIframe, seventhVideoSrc]);
+  }, [showIframe, showSecondIframe, seventhVideoSrc, playNextVideo, handleGameMessage]);
 
   useEffect(() => {
     const handleEnded = () => {

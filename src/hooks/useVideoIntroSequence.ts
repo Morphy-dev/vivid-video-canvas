@@ -2,7 +2,7 @@
 import { useState, useCallback } from "react";
 
 export const useVideoIntroSequence = (initialShowIndex: boolean = false) => {
-  const [showIndex, setShowIndex] = useState(initialShowIndex);
+  const [showIndex, setShowIndex] = useState(false); // Changed to default false
   const [showIntroFrame, setShowIntroFrame] = useState(true);
 
   const handleIndexClose = useCallback(() => {

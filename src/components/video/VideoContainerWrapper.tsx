@@ -79,4 +79,3 @@ const VideoContainerWrapper: React.FC<VideoContainerWrapperProps> = ({
 };
 
 export default VideoContainerWrapper;
-

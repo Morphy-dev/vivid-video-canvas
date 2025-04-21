@@ -1,8 +1,10 @@
+
 import { useCallback } from 'react';
 
 interface UseVideoSequenceLogicProps {
   playNextVideo: (nextSrc: string, nextIndex: number) => Promise<void>;
   setShowIframe: (show: boolean) => void;
+  setShowSecondIframe: (show: boolean) => void;
   handleOverlayTransition: () => Promise<void>;
   recordProgress: (src: string, completed?: boolean) => Promise<void>;
 }
@@ -25,6 +27,7 @@ interface VideoSources {
 export const useVideoSequenceLogic = ({
   playNextVideo,
   setShowIframe,
+  setShowSecondIframe,
   handleOverlayTransition,
   recordProgress
 }: UseVideoSequenceLogicProps) => {
@@ -67,36 +70,34 @@ export const useVideoSequenceLogic = ({
         if (sixthVideoSrc) await playNextVideo(sixthVideoSrc, 6);
         break;
       case 6:
-        if (seventhVideoSrc) await playNextVideo(seventhVideoSrc, 7);
-        break;
-      case 7:
+        // After sixth video, show first iframe
         setShowIframe(true);
         break;
-      case 8:
+      case 7:
         if (eighthVideoSrc) await playNextVideo(eighthVideoSrc, 8);
         break;
-      case 9:
+      case 8:
         if (ninthVideoSrc) await playNextVideo(ninthVideoSrc, 9);
         break;
-      case 10:
+      case 9:
         if (tenthVideoSrc) await playNextVideo(tenthVideoSrc, 10);
         break;
-      case 11:
+      case 10:
         if (eleventhVideoSrc) await playNextVideo(eleventhVideoSrc, 11);
         break;
-      case 12:
+      case 11:
         if (twelfthVideoSrc) await playNextVideo(twelfthVideoSrc, 12);
         break;
-      case 13:
+      case 12:
         if (thirteenthVideoSrc) await playNextVideo(thirteenthVideoSrc, 13);
         break;
-      case 14:
+      case 13:
         if (thirteenthVideoSrc) {
           await recordProgress(thirteenthVideoSrc, true);
         }
         break;
     }
-  }, [playNextVideo, setShowIframe, handleOverlayTransition, recordProgress]);
+  }, [playNextVideo, setShowIframe, setShowSecondIframe, handleOverlayTransition, recordProgress]);
 
   return { handleVideoSequence };
 };
