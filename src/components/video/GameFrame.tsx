@@ -10,7 +10,7 @@ interface GameFrameProps {
 const GameFrame: React.FC<GameFrameProps> = ({ 
   sessionId, 
   studentId,
-  gameUrl = 'https://preview--confetti-square-celebration.lovable.app'
+  gameUrl = 'https://preview--sunny-day-selector.lovable.app/'
 }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [isOpen, setIsOpen] = useState(true);

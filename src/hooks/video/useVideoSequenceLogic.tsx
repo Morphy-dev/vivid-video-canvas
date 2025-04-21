@@ -1,4 +1,3 @@
-
 import { useCallback } from 'react';
 
 interface UseVideoSequenceLogicProps {
@@ -40,6 +39,7 @@ export const useVideoSequenceLogic = ({
       fourthVideoSrc,
       fifthVideoSrc,
       sixthVideoSrc,
+      seventhVideoSrc,
       eighthVideoSrc,
       ninthVideoSrc,
       tenthVideoSrc,
@@ -52,10 +52,7 @@ export const useVideoSequenceLogic = ({
     
     switch (index) {
       case 1:
-        if (nextVideoSrc) {
-          // We don't need overlay transition for the first video
-          await playNextVideo(nextVideoSrc, 2);
-        }
+        if (nextVideoSrc) await playNextVideo(nextVideoSrc, 2);
         break;
       case 2:
         if (thirdVideoSrc) await playNextVideo(thirdVideoSrc, 3);
@@ -70,27 +67,30 @@ export const useVideoSequenceLogic = ({
         if (sixthVideoSrc) await playNextVideo(sixthVideoSrc, 6);
         break;
       case 6:
-        setShowIframe(true);
+        if (seventhVideoSrc) await playNextVideo(seventhVideoSrc, 7);
         break;
       case 7:
-        if (eighthVideoSrc) await playNextVideo(eighthVideoSrc, 8);
+        setShowIframe(true);
         break;
       case 8:
-        if (ninthVideoSrc) await playNextVideo(ninthVideoSrc, 9);
+        if (eighthVideoSrc) await playNextVideo(eighthVideoSrc, 8);
         break;
       case 9:
-        if (tenthVideoSrc) await playNextVideo(tenthVideoSrc, 10);
+        if (ninthVideoSrc) await playNextVideo(ninthVideoSrc, 9);
         break;
       case 10:
-        if (eleventhVideoSrc) await playNextVideo(eleventhVideoSrc, 11);
+        if (tenthVideoSrc) await playNextVideo(tenthVideoSrc, 10);
         break;
       case 11:
-        if (twelfthVideoSrc) await playNextVideo(twelfthVideoSrc, 12);
+        if (eleventhVideoSrc) await playNextVideo(eleventhVideoSrc, 11);
         break;
       case 12:
-        if (thirteenthVideoSrc) await playNextVideo(thirteenthVideoSrc, 13);
+        if (twelfthVideoSrc) await playNextVideo(twelfthVideoSrc, 12);
         break;
       case 13:
+        if (thirteenthVideoSrc) await playNextVideo(thirteenthVideoSrc, 13);
+        break;
+      case 14:
         if (thirteenthVideoSrc) {
           await recordProgress(thirteenthVideoSrc, true);
         }

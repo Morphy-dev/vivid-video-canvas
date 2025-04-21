@@ -1,23 +1,17 @@
 
 import { useState, useCallback } from "react";
 
-/**
- * Manages the transition between video index, intro frame, and video playback.
- */
-export const useVideoIntroSequence = (initialShowIndex: boolean = true) => {
-  // Show the index first
+export const useVideoIntroSequence = (initialShowIndex: boolean = false) => {
   const [showIndex, setShowIndex] = useState(initialShowIndex);
-  // Only show intro AFTER index is closed
-  const [showIntroFrame, setShowIntroFrame] = useState(false);
+  const [showIntroFrame, setShowIntroFrame] = useState(true);
 
   const handleIndexClose = useCallback(() => {
     setShowIndex(false);
-    setShowIntroFrame(true); // Now show intro frame
+    setShowIntroFrame(true);
   }, []);
 
   const handleIntroFinish = useCallback(() => {
     setShowIntroFrame(false);
-    // Now the video will be shown
   }, []);
 
   return {
