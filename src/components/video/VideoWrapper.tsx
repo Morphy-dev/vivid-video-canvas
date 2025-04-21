@@ -1,9 +1,8 @@
 
-import React from 'react';
-import VideoContainer from './VideoContainer';
-import GameFrame from './GameFrame';
-import IntroFrame from "./IntroFrame";
-import VideoIndexFrame from "./VideoIndexFrame";
+import React, { useEffect } from 'react';
+import IntroFrameWrapper from './IntroFrameWrapper';
+import VideoIndexWrapper from './VideoIndexWrapper';
+import VideoContainerWrapper from './VideoContainerWrapper';
 import { useVideoWrapperController } from '../../hooks/useVideoWrapperController';
 
 const VideoWrapper = (props: any) => {
@@ -25,71 +24,56 @@ const VideoWrapper = (props: any) => {
     sequence,
     sessionId,
     studentId,
-    INTRO_IMAGE_URL
+    INTRO_IMAGE_URL,
   } = useVideoWrapperController(props);
 
-  if (showIntroFrame && !showIndex) {
+  // When intro finishes (showIntroFrame turns false), play video immediately if index is not shown
+  useEffect(() => {
+    if (!showIntroFrame && !showIndex && videoRef.current && !isPlaying) {
+      videoRef.current.play();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showIntroFrame, showIndex]);
+
+  if (showIntroFrame) {
     return (
-      <div className={`relative w-full max-w-6xl mx-auto ${className}`}>
-        <IntroFrame
-          show={true}
-          onFinish={() => setShowIntroFrame(false)}
-          dayImage={dayAssets.image}
-          daySound={dayAssets.sound}
-          backgroundUrl={INTRO_IMAGE_URL}
-        />
-      </div>
+      <IntroFrameWrapper
+        showIntroFrame={showIntroFrame}
+        setShowIntroFrame={setShowIntroFrame}
+        dayAssets={dayAssets}
+        INTRO_IMAGE_URL={INTRO_IMAGE_URL}
+        className={className}
+      />
     );
   }
 
   if (showIndex) {
     return (
-      <VideoIndexFrame
+      <VideoIndexWrapper
+        showIndex={showIndex}
+        setShowIndex={setShowIndex}
         availableVideos={availableVideos}
-        onSelect={handleIndexSelect}
-        onFirstVideo={() => setShowIndex(false)}
       />
     );
   }
 
   return (
-    <div className={`relative w-full max-w-6xl mx-auto ${className}`}>
-      <div className="relative w-full" style={{ aspectRatio: "16/9" }}>
-        {!sequence.showIframe && !sequence.showSecondIframe && (
-          <VideoContainer
-            currentSrc={sequence.currentSrc}
-            isPlaying={isPlaying}
-            showOverlay={
-              // Only show overlay for days after video 1
-              sequence.currentVideoIndex !== 1 && sequence.showOverlay
-            }
-            onPlayPause={handlePlayPause}
-            onFullscreen={handleFullscreen}
-            onShowIndex={() => setShowIndex(true)}
-            preloadedSources={preloadedSources}
-            preloadedRefs={preloadedRefs}
-            videoRef={videoRef}
-            overlayImageSrc={dayAssets.image}
-            showDayOverlay={false}
-          />
-        )}
-        {sequence.showIframe && (
-          <GameFrame
-            sessionId={sessionId}
-            studentId={studentId}
-            gameUrl="https://preview--confetti-square-celebration.lovable.app"
-          />
-        )}
-        {sequence.showSecondIframe && (
-          <GameFrame
-            sessionId={sessionId}
-            studentId={studentId}
-            gameUrl="https://preview--item-picker-fall.lovable.app"
-          />
-        )}
-      </div>
-    </div>
+    <VideoContainerWrapper
+      className={className}
+      sequence={sequence}
+      isPlaying={isPlaying}
+      handlePlayPause={handlePlayPause}
+      handleFullscreen={handleFullscreen}
+      setShowIndex={setShowIndex}
+      preloadedSources={preloadedSources}
+      preloadedRefs={preloadedRefs}
+      videoRef={videoRef}
+      dayAssets={dayAssets}
+      sessionId={sessionId}
+      studentId={studentId}
+    />
   );
 };
 
 export default VideoWrapper;
+

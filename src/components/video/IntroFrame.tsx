@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from "react";
 
 interface IntroFrameProps {
@@ -52,16 +51,13 @@ const IntroFrame: React.FC<IntroFrameProps> = ({
         alt="Intro"
         style={{ zIndex: 1 }}
       />
-      {/* Day-of-week image and label */}
+      {/* Day-of-week image */}
       <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ zIndex: 2 }}>
         <img
           src={dayImage}
           alt="Day"
           className="h-[38vh] w-auto object-contain drop-shadow-lg rounded-md"
         />
-        <p className="mt-6 text-4xl md:text-5xl lg:text-6xl font-bold drop-shadow-xl text-white animate-fade-in">
-          Today is...
-        </p>
       </div>
       <audio ref={audioRef} src={daySound} preload="auto" />
     </div>
