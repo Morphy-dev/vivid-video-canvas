@@ -106,12 +106,12 @@ export const useVideoSequence = ({
 
   useEffect(() => {
     const messageHandler = (event: MessageEvent) => {
-      handleGameMessage(event, seventhVideoSrc, playNextVideo);
+      handleGameMessage(event, seventhVideoSrc, eighthVideoSrc, playNextVideo);
     };
 
     window.addEventListener('message', messageHandler);
     return () => window.removeEventListener('message', messageHandler);
-  }, [showIframe, showSecondIframe, showThirdIframe, seventhVideoSrc]);
+  }, [showIframe, showSecondIframe, showThirdIframe, seventhVideoSrc, eighthVideoSrc]);
 
   useEffect(() => {
     const handleEnded = () => {

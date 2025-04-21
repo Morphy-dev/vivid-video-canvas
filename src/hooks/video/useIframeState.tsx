@@ -6,7 +6,12 @@ export const useIframeState = () => {
   const [showSecondIframe, setShowSecondIframe] = useState(false);
   const [showThirdIframe, setShowThirdIframe] = useState(false);
 
-  const handleGameMessage = (event: MessageEvent, seventhVideoSrc: string | undefined, playNextVideo: (src: string, index: number) => void) => {
+  const handleGameMessage = (
+    event: MessageEvent, 
+    seventhVideoSrc: string | undefined, 
+    eighthVideoSrc: string | undefined, 
+    playNextVideo: (src: string, index: number) => void
+  ) => {
     console.log('Received message from iframe:', event.data);
     
     if (event.data?.type === "game_finished") {
