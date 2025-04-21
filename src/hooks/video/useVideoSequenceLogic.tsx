@@ -53,7 +53,7 @@ export const useVideoSequenceLogic = ({
     switch (index) {
       case 1:
         if (nextVideoSrc) {
-          await handleOverlayTransition();
+          // We don't need overlay transition for the first video
           await playNextVideo(nextVideoSrc, 2);
         }
         break;
