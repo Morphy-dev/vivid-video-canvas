@@ -1,5 +1,5 @@
 
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { RefObject } from 'react';
 import { useVideoTransition } from './video/useVideoTransition';
 import { useVideoOverlay } from './video/useVideoOverlay';
@@ -68,6 +68,8 @@ export const useVideoSequence = ({
     setShowIframe, 
     showSecondIframe, 
     setShowSecondIframe,
+    handleFirstGameComplete,
+    handleSecondGameComplete,
     handleGameMessage 
   } = useIframeState();
 
@@ -102,6 +104,14 @@ export const useVideoSequence = ({
     recordProgress,
     videoRef
   });
+
+  const handleFirstGameCompleteCallback = useCallback(() => {
+    handleFirstGameComplete();
+  }, [handleFirstGameComplete]);
+
+  const handleSecondGameCompleteCallback = useCallback(() => {
+    handleSecondGameComplete(seventhVideoSrc, playNextVideo);
+  }, [handleSecondGameComplete, seventhVideoSrc, playNextVideo]);
 
   useEffect(() => {
     const messageHandler = (event: MessageEvent) => {
@@ -146,6 +156,8 @@ export const useVideoSequence = ({
     showOverlay,
     showIframe,
     showSecondIframe,
-    jumpToVideo: jumpToVideoWrapper
+    jumpToVideo: jumpToVideoWrapper,
+    handleFirstGameComplete: handleFirstGameCompleteCallback,
+    handleSecondGameComplete: handleSecondGameCompleteCallback
   };
 };

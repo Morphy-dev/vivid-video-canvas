@@ -80,6 +80,8 @@ const VideoWrapper = (props: any) => {
       dayAssets={dayAssets}
       sessionId={sessionId}
       studentId={studentId}
+      onFirstGameComplete={sequence.handleFirstGameComplete}
+      onSecondGameComplete={sequence.handleSecondGameComplete}
     />
   );
 };
