@@ -1,5 +1,5 @@
 
-import { useEffect, useCallback } from 'react';
+import { useEffect } from 'react';
 import { RefObject } from 'react';
 import { useVideoTransition } from './video/useVideoTransition';
 import { useVideoOverlay } from './video/useVideoOverlay';
@@ -68,8 +68,6 @@ export const useVideoSequence = ({
     setShowIframe, 
     showSecondIframe, 
     setShowSecondIframe,
-    handleFirstGameComplete,
-    handleSecondGameComplete,
     handleGameMessage 
   } = useIframeState();
 
@@ -92,7 +90,6 @@ export const useVideoSequence = ({
   const { handleVideoSequence } = useVideoSequenceLogic({
     playNextVideo,
     setShowIframe,
-    setShowSecondIframe,
     handleOverlayTransition,
     recordProgress
   });
@@ -105,14 +102,6 @@ export const useVideoSequence = ({
     videoRef
   });
 
-  const handleFirstGameCompleteCallback = useCallback(() => {
-    handleFirstGameComplete();
-  }, [handleFirstGameComplete]);
-
-  const handleSecondGameCompleteCallback = useCallback(() => {
-    handleSecondGameComplete(seventhVideoSrc, playNextVideo);
-  }, [handleSecondGameComplete, seventhVideoSrc, playNextVideo]);
-
   useEffect(() => {
     const messageHandler = (event: MessageEvent) => {
       handleGameMessage(event, seventhVideoSrc, playNextVideo);
@@ -120,7 +109,7 @@ export const useVideoSequence = ({
 
     window.addEventListener('message', messageHandler);
     return () => window.removeEventListener('message', messageHandler);
-  }, [showIframe, showSecondIframe, seventhVideoSrc, playNextVideo, handleGameMessage]);
+  }, [showIframe, showSecondIframe, seventhVideoSrc]);
 
   useEffect(() => {
     const handleEnded = () => {
@@ -156,8 +145,6 @@ export const useVideoSequence = ({
     showOverlay,
     showIframe,
     showSecondIframe,
-    jumpToVideo: jumpToVideoWrapper,
-    handleFirstGameComplete: handleFirstGameCompleteCallback,
-    handleSecondGameComplete: handleSecondGameCompleteCallback
+    jumpToVideo: jumpToVideoWrapper
   };
 };

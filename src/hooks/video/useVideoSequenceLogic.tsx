@@ -4,7 +4,6 @@ import { useCallback } from 'react';
 interface UseVideoSequenceLogicProps {
   playNextVideo: (nextSrc: string, nextIndex: number) => Promise<void>;
   setShowIframe: (show: boolean) => void;
-  setShowSecondIframe: (show: boolean) => void;
   handleOverlayTransition: () => Promise<void>;
   recordProgress: (src: string, completed?: boolean) => Promise<void>;
 }
@@ -27,7 +26,6 @@ interface VideoSources {
 export const useVideoSequenceLogic = ({
   playNextVideo,
   setShowIframe,
-  setShowSecondIframe,
   handleOverlayTransition,
   recordProgress
 }: UseVideoSequenceLogicProps) => {
@@ -42,7 +40,6 @@ export const useVideoSequenceLogic = ({
       fourthVideoSrc,
       fifthVideoSrc,
       sixthVideoSrc,
-      seventhVideoSrc,
       eighthVideoSrc,
       ninthVideoSrc,
       tenthVideoSrc,
@@ -55,7 +52,10 @@ export const useVideoSequenceLogic = ({
     
     switch (index) {
       case 1:
-        if (nextVideoSrc) await playNextVideo(nextVideoSrc, 2);
+        if (nextVideoSrc) {
+          // We don't need overlay transition for the first video
+          await playNextVideo(nextVideoSrc, 2);
+        }
         break;
       case 2:
         if (thirdVideoSrc) await playNextVideo(thirdVideoSrc, 3);
@@ -70,7 +70,6 @@ export const useVideoSequenceLogic = ({
         if (sixthVideoSrc) await playNextVideo(sixthVideoSrc, 6);
         break;
       case 6:
-        // After sixth video, show first iframe
         setShowIframe(true);
         break;
       case 7:
@@ -97,7 +96,7 @@ export const useVideoSequenceLogic = ({
         }
         break;
     }
-  }, [playNextVideo, setShowIframe, setShowSecondIframe, handleOverlayTransition, recordProgress]);
+  }, [playNextVideo, setShowIframe, handleOverlayTransition, recordProgress]);
 
   return { handleVideoSequence };
 };

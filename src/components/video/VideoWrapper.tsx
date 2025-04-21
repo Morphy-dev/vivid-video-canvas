@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import IntroFrameWrapper from "./IntroFrameWrapper";
 import VideoIndexWrapper from "./VideoIndexWrapper";
@@ -24,14 +23,13 @@ const VideoWrapper = (props: any) => {
     INTRO_IMAGE_URL,
   } = useVideoWrapperController(props);
 
-  // This handles the logic: intro → video (default, without index)
+  // This handles the logic: index → intro → video
   const {
     showIndex,
     showIntroFrame,
     handleIndexClose,
     handleIntroFinish,
-    setShowIndex
-  } = useVideoIntroSequence(false); // Changed to false to skip index initially
+  } = useVideoIntroSequence(true);
 
   // Play video (autoplay) when intro frame ends
   useEffect(() => {
@@ -41,7 +39,7 @@ const VideoWrapper = (props: any) => {
     // eslint-disable-next-line
   }, [showIntroFrame, showIndex]);
 
-  // Render index if selected through controls
+  // Render index FIRST if needed
   if (showIndex) {
     return (
       <VideoIndexWrapper
@@ -52,7 +50,7 @@ const VideoWrapper = (props: any) => {
     );
   }
 
-  // Render intro frame first (default view now)
+  // Render intro frame AFTER index (only once index is closed)
   if (showIntroFrame) {
     return (
       <IntroFrameWrapper
@@ -73,15 +71,13 @@ const VideoWrapper = (props: any) => {
       isPlaying={isPlaying}
       handlePlayPause={handlePlayPause}
       handleFullscreen={handleFullscreen}
-      setShowIndex={() => setShowIndex(true)} // Changed to set showIndex to true when menu button is clicked
+      setShowIndex={() => handleIndexClose()} // reuse for menu button: show menu → close intro
       preloadedSources={preloadedSources}
       preloadedRefs={preloadedRefs}
       videoRef={videoRef}
       dayAssets={dayAssets}
       sessionId={sessionId}
       studentId={studentId}
-      onFirstGameComplete={sequence.handleFirstGameComplete}
-      onSecondGameComplete={sequence.handleSecondGameComplete}
     />
   );
 };

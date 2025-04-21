@@ -78,7 +78,6 @@ export const useJumpToVideo = ({
       await recordProgress(newSrc);
       
       if (index === 6) {
-        // After the sixth video, show first iframe
         setShowIframe(true);
       } else if (videoRef.current) {
         videoRef.current.play();

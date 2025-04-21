@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import VideoCanvas from '../components/VideoCanvas';
@@ -24,12 +25,14 @@ const Index = () => {
 
   const handleGroupFound = async (foundGroupId: string) => {
     try {
+      // Fetch students for the group
       const { data: studentsData, error: studentsError } = await supabase
         .from('estudiantes')
         .select('id, nombre_completo, foto_url, grupo_id')
         .eq('grupo_id', foundGroupId)
         .eq('status', true);
 
+      // Fetch school name
       const { data: groupData, error: groupError } = await supabase
         .from('grupos')
         .select('instituciones(nombre)')
@@ -69,6 +72,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-soft-gray relative flex items-center justify-center p-8">
+      {/* Student and School Info in Top Right Corner */}
       <div className="absolute top-4 right-4 text-right z-10">
         <div className="flex items-center justify-end space-x-2">
           <Avatar className="w-12 h-12">
@@ -92,7 +96,7 @@ const Index = () => {
           thirdVideoSrc="https://ksnyoasamhyunakuqdst.supabase.co/storage/v1/object/sign/videos/Semana01_Escena%2003%20V3.mp4?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJ2aWRlb3MvU2VtYW5hMDFfRXNjZW5hIDAzIFYzLm1wNCIsImlhdCI6MTc0NDkxOTEyNywiZXhwIjoxNzQ1NTIzOTI3fQ.l50gIahSGXlXUG3d0T63jfIQfLWyTPIvDRFSPwiglAo"
           fourthVideoSrc="https://ksnyoasamhyunakuqdst.supabase.co/storage/v1/object/sign/videos/Semana01_Escena04.mp4?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJ2aWRlb3MvU2VtYW5hMDFfRXNjZW5hMDQubXA0IiwiaWF0IjoxNzQ0OTMwOTMwLCJleHAiOjE3NDU1MzU3MzB9.2aEhK746x6wV8Pi7TpNVZMfI1gaiL4xtUGko737vis8"
           fifthVideoSrc="https://ksnyoasamhyunakuqdst.supabase.co/storage/v1/object/sign/videos/Semana01_Escena%2005%20v3.mp4?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJ2aWRlb3MvU2VtYW5hMDFfRXNjZW5hIDA1IHYzLm1wNCIsImlhdCI6MTc0NDkzMTQxOCwiZXhwIjoxNzQ1NTM2MjE4fQ.dADQzHEJnnAzMeQJV0N97DAG7rzuNiwTzmKTdugaMo0"
-          sixthVideoSrc="https://ksnyoasamhyunakuqdst.supabase.co/storage/v1/object/sign/videos/Semana01_Escena%2006%20V4.mp4?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InN0b3JhZ2UtdXJsLXNpZ25pbmcta2V5XzBkNjQ4NTJjLTUwN2ItNGZkOC05YTA4LTNlNDU5NjZkYWRjMiJ9.eyJ1cmwiOiJ2aWRlb3MvU2VtYW5hMDFfRXNjZW5hIDA2IFY0Lm1wNCIsImlhdCI6MTc0NTI1NDQ4OSwiZXhwIjoxNzQ1ODU5Mjg5fQ.Bj2I5iTqyjSYm3uCSReXUyVZ1kA9uJ6pYxmbA9mY0Tw"
+          sixthVideoSrc="https://ksnyoasamhyunakuqdst.supabase.co/storage/v1/object/sign/videos/Semana01_Escena%2006%20v3.mp4?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJ2aWRlb3MvU2VtYW5hMDFfRXNjZW5hIDA2IHYzLm1wNCIsImlhdCI6MTc0NDkzODIxMiwiZXhwIjoxNzQ1NTQzMDEyfQ.Z4t2GKCWlko5snQ-7Z_V1f_nf0E1IcIDgp8U3HKjqsU"
           seventhVideoSrc="https://ksnyoasamhyunakuqdst.supabase.co/storage/v1/object/sign/videos/Semana01_Escena07.mp4?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InN0b3JhZ2UtdXJsLXNpZ25pbmcta2V5XzBkNjQ4NTJjLTUwN2ItNGZkOC05YTA4LTNlNDU5NjZkYWRjMiJ9.eyJ1cmwiOiJ2aWRlb3MvU2VtYW5hMDFfRXNjZW5hMDcubXA0IiwiaWF0IjoxNzQ1MDg5Mzc0LCJleHAiOjE3NDU2OTQxNzR9.j1vIQlVwNRrqGoOdhoNzYuf0Ej31gnMDGR6lRGPQBr8"
           eighthVideoSrc="https://ksnyoasamhyunakuqdst.supabase.co/storage/v1/object/sign/videos/Semana01_Escena08.mp4?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InN0b3JhZ2UtdXJsLXNpZ25pbmcta2V5XzBkNjQ4NTJjLTUwN2ItNGZkOC05YTA4LTNlNDU5NjZkYWRjMiJ9.eyJ1cmwiOiJ2aWRlb3MvU2VtYW5hMDFfRXNjZW5hMDgubXA0IiwiaWF0IjoxNzQ1MDg5Mzg5LCJleHAiOjE3NDU2OTQxODl9.Nu3u2cKatVVDEQyhkH9xjjjl02re3BIgrMIKyqHqdlA"
           ninthVideoSrc="https://ksnyoasamhyunakuqdst.supabase.co/storage/v1/object/sign/videos/Semana01_Escena%2009.mp4?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InN0b3JhZ2UtdXJsLXNpZ25pbmcta2V5XzBkNjQ4NTJjLTUwN2ItNGZkOC05YTA4LTNlNDU5NjZkYWRjMiJ9.eyJ1cmwiOiJ2aWRlb3MvU2VtYW5hMDFfRXNjZW5hIDA5Lm1wNCIsImlhdCI6MTc0NTA4OTQwMCwiZXhwIjoxNzQ1Njk0MjAwfQ.vrtn7SweYuZETWIBgXNNSsxwyUYhVO7Pp-Bbb6Fldj0"

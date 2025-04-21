@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 
@@ -6,14 +5,12 @@ interface GameFrameProps {
   sessionId: string;
   studentId?: string;
   gameUrl?: string;
-  onGameComplete?: () => void;
 }
 
 const GameFrame: React.FC<GameFrameProps> = ({ 
   sessionId, 
   studentId,
-  gameUrl = 'https://preview--sunny-day-selector.lovable.app/',
-  onGameComplete
+  gameUrl = 'https://preview--confetti-square-celebration.lovable.app'
 }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [isOpen, setIsOpen] = useState(true);
@@ -45,9 +42,6 @@ const GameFrame: React.FC<GameFrameProps> = ({
       if (event.data?.type === "game_finished") {
         console.log("✅ Game is finished!");
         setIsOpen(false);
-        if (onGameComplete) {
-          onGameComplete();
-        }
       }
     };
 
@@ -57,7 +51,7 @@ const GameFrame: React.FC<GameFrameProps> = ({
     return () => {
       window.removeEventListener('message', handleGameMessage);
     };
-  }, [onGameComplete]);
+  }, []);
 
   // Handle iframe load event
   useEffect(() => {

@@ -22,8 +22,6 @@ interface VideoContainerWrapperProps {
   dayAssets: { image: string };
   sessionId: string;
   studentId?: string;
-  onFirstGameComplete?: () => void;
-  onSecondGameComplete?: () => void;
 }
 
 const VideoContainerWrapper: React.FC<VideoContainerWrapperProps> = ({
@@ -39,8 +37,6 @@ const VideoContainerWrapper: React.FC<VideoContainerWrapperProps> = ({
   dayAssets,
   sessionId,
   studentId,
-  onFirstGameComplete,
-  onSecondGameComplete,
 }) => {
   return (
     <div className={`relative w-full max-w-6xl mx-auto ${className}`}>
@@ -68,7 +64,6 @@ const VideoContainerWrapper: React.FC<VideoContainerWrapperProps> = ({
             sessionId={sessionId}
             studentId={studentId}
             gameUrl="https://preview--confetti-square-celebration.lovable.app"
-            onGameComplete={onFirstGameComplete}
           />
         )}
         {sequence.showSecondIframe && (
@@ -76,7 +71,6 @@ const VideoContainerWrapper: React.FC<VideoContainerWrapperProps> = ({
             sessionId={sessionId}
             studentId={studentId}
             gameUrl="https://preview--item-picker-fall.lovable.app"
-            onGameComplete={onSecondGameComplete}
           />
         )}
       </div>
@@ -85,3 +79,4 @@ const VideoContainerWrapper: React.FC<VideoContainerWrapperProps> = ({
 };
 
 export default VideoContainerWrapper;
+
